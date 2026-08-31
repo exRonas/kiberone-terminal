@@ -1,0 +1,192 @@
+{
+  "topic": "basics",
+  "lang": "csharp",
+  "order": 1,
+  "title": "Переменные, типы, вывод",
+  "subtitle": "то же самое, но с типами и скобками",
+  "theory": [
+    {
+      "id": "cs-basics-t1",
+      "title": "Тип пишется перед именем",
+      "text": "В Python коробке всё равно, что внутри. В C# тип объявляется заранее и больше не меняется: `int` — целое, `string` — строка, `bool` — да/нет, `double` — дробное.\n\nКаждая команда заканчивается точкой с запятой. Забыл её — компилятор скажет `CS1002: ; expected`.\n\nВывод на экран — `Console.WriteLine` вместо `print`.",
+      "code": "string name = \"Аня\";\nint age = 13;\n\nConsole.WriteLine(name);\nConsole.WriteLine(age);\n\nage = 14;\nConsole.WriteLine(age);",
+      "code_python": "name = \"Аня\"\nage = 13\n\nprint(name)\nprint(age)\n\nage = 14\nprint(age)"
+    },
+    {
+      "id": "cs-basics-t2",
+      "title": "Фигурные скобки вместо отступов",
+      "text": "В Python границу блока задаёт отступ. В C# — фигурные скобки `{` и `}`, а отступы нужны только людям.\n\nЗато скобки надо закрывать все до одной. Не закрыл — `CS1513: } expected`.\n\n`class Program { ... }` — обязательная рамка языка. Внутри неё мы пишем функции со словом `static`. Что такое class, разберём на следующих занятиях; сейчас это просто рамка.",
+      "code": "int temperature = -5;\n\nif (temperature < 0)\n{\n    Console.WriteLine(\"Мороз\");\n    Console.WriteLine(\"Надень шапку\");\n}\nelse\n{\n    Console.WriteLine(\"Плюс\");\n}",
+      "code_python": "temperature = -5\n\nif temperature < 0:\n    print(\"Мороз\")\n    print(\"Надень шапку\")\nelse:\n    print(\"Плюс\")"
+    },
+    {
+      "id": "cs-basics-t3",
+      "title": "Деление целых даёт целое",
+      "text": "Главная ловушка темы. В Python `7 / 2` даёт `3.5`. В C# два целых делятся нацело: `7 / 2` даёт `3`, дробная часть просто отбрасывается.\n\nЧтобы получить дробь, хотя бы одно число должно быть дробным: `7.0 / 2`.\n\nОстаток `%` работает как в Python. Целого деления `//` в C# нет — оно и не нужно, обычное `/` для целых и есть целое.",
+      "code": "Console.WriteLine(7 + 3);\nConsole.WriteLine(7 / 2);\nConsole.WriteLine(7.0 / 2);\nConsole.WriteLine(7 % 2);\n\nint seconds = 125;\nConsole.WriteLine(seconds / 60 + \" мин \" + seconds % 60 + \" с\");",
+      "code_python": "print(7 + 3)\nprint(7 / 2)\nprint(7 // 2)\nprint(7 % 2)\n\nseconds = 125\nprint(seconds // 60, \"мин\", seconds % 60, \"с\")"
+    },
+    {
+      "id": "cs-basics-t4",
+      "title": "У функции объявляют тип ответа",
+      "text": "`def double(x)` превращается в `static int Double(int x)`. Слева от имени — тип того, что функция вернёт.\n\nЕсли функция ничего не возвращает, пишут `void`. Если возвращает, `return` обязан сработать во всех ветках, иначе `CS0161`.\n\nИмена методов в C# принято писать с большой буквы: `IsEven`, а не `is_even`. Это соглашение, а не требование компилятора, но дальше вы будете писать именно так.",
+      "code": "static int DoubleIt(int x)\n{\n    return x * 2;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(DoubleIt(5));\n    Console.WriteLine(DoubleIt(21));\n}",
+      "code_python": "def double_it(x):\n    return x * 2\n\n\nprint(double_it(5))\nprint(double_it(21))"
+    },
+    {
+      "id": "cs-basics-t5",
+      "title": "Что говорит компилятор",
+      "text": "Python выполняет код сразу и падает на той строке, до которой дошёл. C# сначала компилирует программу целиком и отказывается запускать её, пока есть хоть одна ошибка.\n\nЭто выглядит строже, но на деле удобнее: половина опечаток ловится до запуска.\n\nЧетыре сообщения, которые вы увидите чаще всего:\n\n`CS1002: ; expected` — забыта точка с запятой.\n`CS1513: } expected` — не закрыта фигурная скобка.\n`CS0029: cannot convert` — тип не тот: например, строку кладут в int.\n`CS1061: no definition for` — опечатка в имени метода.\n\nНомер строки в сообщении — номер строки в твоём коде.",
+      "code": "int n = 5;\nConsole.WriteLine(n);\n\n// Попробуй сломать это специально:\n// убери точку с запятой в строке выше\n// или напиши  int x = \"текст\";\n// и посмотри, что скажет компилятор.",
+      "code_python": "# В Python таких сообщений нет: он не компилирует\n# программу заранее, а выполняет строку за строкой.\nn = 5\nprint(n)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "basics-1",
+      "topic": "basics",
+      "title": "Приветствие",
+      "statement": "Напиши функцию, которая получает имя и возвращает строку «Привет, Аня!».\n\nЗапятая, пробел и восклицательный знак — на своих местах. Печатать ничего не нужно, только вернуть.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Greet(string name)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Greet",
+      "signature": {
+        "args": [
+          "string"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            "Аня"
+          ],
+          "expect": "Привет, Аня!"
+        },
+        {
+          "args": [
+            "Кирилл"
+          ],
+          "expect": "Привет, Кирилл!"
+        },
+        {
+          "args": [
+            "Ян"
+          ],
+          "expect": "Привет, Ян!"
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": "Привет, !",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Строки в C# тоже склеиваются знаком `+`.",
+        "Соедини три куска: «Привет, », имя и «!».",
+        "return \"Привет, \" + name + \"!\";  — не забудь точку с запятой."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Greet(string name)\n    {\n        return \"Привет, \" + name + \"!\";\n    }\n}\n"
+    },
+    {
+      "id": "basics-2",
+      "topic": "basics",
+      "title": "Площадь прямоугольника",
+      "statement": "Напиши функцию, которая по двум сторонам возвращает площадь прямоугольника.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int RectangleArea(int a, int b)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "RectangleArea",
+      "signature": {
+        "args": [
+          "int",
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            3,
+            4
+          ],
+          "expect": 12
+        },
+        {
+          "args": [
+            10,
+            10
+          ],
+          "expect": 100
+        },
+        {
+          "args": [
+            7,
+            1
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            0,
+            5
+          ],
+          "expect": 0,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Площадь прямоугольника — произведение сторон.",
+        "Тип ответа объявлен как `int`, значит вернуть надо целое.",
+        "return a * b;"
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int RectangleArea(int a, int b)\n    {\n        return a * b;\n    }\n}\n"
+    },
+    {
+      "id": "basics-3",
+      "topic": "basics",
+      "title": "Секунды в часы и минуты",
+      "statement": "Напиши функцию, которая переводит число секунд в строку вида «1 ч 5 мин 3 с».\n\nВсе три части пишутся всегда, даже если там ноль: 59 секунд — это «0 ч 0 мин 59 с».",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string SecondsToTime(int sec)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "SecondsToTime",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            3903
+          ],
+          "expect": "1 ч 5 мин 3 с"
+        },
+        {
+          "args": [
+            59
+          ],
+          "expect": "0 ч 0 мин 59 с"
+        },
+        {
+          "args": [
+            3600
+          ],
+          "expect": "1 ч 0 мин 0 с"
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": "0 ч 0 мин 0 с",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "В часе 3600 секунд, в минуте 60.",
+        "Здесь целое деление `/` работает само: `sec / 3600` уже даёт целое, `//` в C# нет.",
+        "Число приклеивается к строке через `+` без str(...): `sec + \" с\"` работает."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string SecondsToTime(int sec)\n    {\n        int hours = sec / 3600;\n        int rest = sec % 3600;\n        int minutes = rest / 60;\n        int seconds = rest % 60;\n        return hours + \" ч \" + minutes + \" мин \" + seconds + \" с\";\n    }\n}\n"
+    }
+  ]
+}

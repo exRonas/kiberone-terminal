@@ -1,0 +1,192 @@
+{
+  "topic": "loops-for",
+  "lang": "csharp",
+  "order": 3,
+  "title": "Цикл for и range",
+  "subtitle": "три части цикла вместо range",
+  "theory": [
+    {
+      "id": "cs-loops-for-t1",
+      "title": "for состоит из трёх частей",
+      "text": "В Python `for` берёт готовые значения из `range`. В C# всё пишут руками, зато видно целиком:\n\n`for (int i = 0; i < 5; i++)` — начали с нуля, крутим пока `i < 5`, после каждого шага прибавляем единицу.\n\n`i++` — короткая запись для `i = i + 1`.\n\nОбрати внимание: `i < 5` даёт те же пять шагов, что `range(5)`. Правая граница так же не входит.",
+      "code": "for (int i = 0; i < 5; i++)\n{\n    Console.WriteLine(i);\n}\n\nConsole.WriteLine(\"---\");\n\nfor (int i = 2; i < 6; i++)\n{\n    Console.WriteLine(i);\n}",
+      "code_python": "for i in range(5):\n    print(i)\n\nprint(\"---\")\n\nfor i in range(2, 6):\n    print(i)"
+    },
+    {
+      "id": "cs-loops-for-t2",
+      "title": "Шаг задаётся третьей частью",
+      "text": "Третья часть — это то, что происходит после каждого шага. Там может быть что угодно: `i += 2`, `i--`, `i = i * 2`.\n\nСчёт назад: `for (int i = 5; i > 0; i--)`. Никакого отдельного range с минус единицей не нужно.",
+      "code": "for (int i = 0; i < 10; i += 2)\n{\n    Console.WriteLine(i);\n}\n\nConsole.WriteLine(\"---\");\n\nfor (int i = 5; i > 0; i--)\n{\n    Console.WriteLine(i);\n}",
+      "code_python": "for i in range(0, 10, 2):\n    print(i)\n\nprint(\"---\")\n\nfor i in range(5, 0, -1):\n    print(i)"
+    },
+    {
+      "id": "cs-loops-for-t3",
+      "title": "foreach — перебор без номеров",
+      "text": "Когда номер не нужен, а нужны сами элементы, пишут `foreach`. Это ближайший родственник питоновского `for x in items`.\n\nТип элемента указывают явно: `foreach (char c in text)`.",
+      "code": "string text = \"кот\";\n\nforeach (char letter in text)\n{\n    Console.WriteLine(letter);\n}\n\nConsole.WriteLine(\"готово\");",
+      "code_python": "text = \"кот\"\n\nfor letter in text:\n    print(letter)\n\nprint(\"готово\")"
+    },
+    {
+      "id": "cs-loops-for-t4",
+      "title": "Копилка: список объявляют с типом",
+      "text": "Приём тот же: переменная до цикла, изменение внутри. Разница в объявлении.\n\nСписок в C# — это `List<int>`, и его надо создать: `List<int> numbers = new List<int>();`. Добавление — `Add` вместо `append`.\n\nВ угловых скобках пишут, что внутри списка. Список целых и список строк — разные типы, смешивать нельзя.",
+      "code": "int total = 0;\nfor (int i = 1; i < 5; i++)\n{\n    total = total + i;\n}\nConsole.WriteLine(total);\n\nList<int> numbers = new List<int>();\nfor (int i = 0; i < 3; i++)\n{\n    numbers.Add(i * i);\n}\nConsole.WriteLine(string.Join(\", \", numbers));",
+      "code_python": "total = 0\nfor i in range(1, 5):\n    total = total + i\nprint(total)\n\nnumbers = []\nfor i in range(3):\n    numbers.append(i * i)\nprint(numbers)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "loops-for-1",
+      "topic": "loops-for",
+      "title": "Сумма до n",
+      "statement": "Напиши функцию, которая возвращает сумму всех чисел от 1 до n включительно.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int SumTo(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "SumTo",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            5
+          ],
+          "expect": 15
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 1
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 5050
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи копилку `int total = 0;` до цикла.",
+        "`for (int i = 1; i <= n; i++)` даёт числа от 1 до n включительно.",
+        "Обрати внимание на `<=`: с `<` последнее число потеряется."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int SumTo(int n)\n    {\n        int total = 0;\n        for (int i = 1; i <= n; i++)\n        {\n            total = total + i;\n        }\n        return total;\n    }\n}\n"
+    },
+    {
+      "id": "loops-for-2",
+      "topic": "loops-for",
+      "title": "Обратный отсчёт",
+      "statement": "Напиши функцию, которая по числу n возвращает список чисел от n до 1.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] CountDown(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "CountDown",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int[]"
+      },
+      "tests": [
+        {
+          "args": [
+            5
+          ],
+          "expect": [
+            5,
+            4,
+            3,
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": [
+            1
+          ]
+        },
+        {
+          "args": [
+            3
+          ],
+          "expect": [
+            3,
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Собирай в `List<int> result = new List<int>();`, добавляй через `Add`.",
+        "Счёт назад: `for (int i = n; i > 0; i--)`.",
+        "Тип ответа — `int[]`, поэтому в конце `return result.ToArray();`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] CountDown(int n)\n    {\n        List<int> result = new List<int>();\n        for (int i = n; i > 0; i--)\n        {\n            result.Add(i);\n        }\n        return result.ToArray();\n    }\n}\n"
+    },
+    {
+      "id": "loops-for-3",
+      "topic": "loops-for",
+      "title": "Лесенка",
+      "statement": "Напиши функцию, которая возвращает лесенку из решёток: в первой строке одна решётка, во второй две, и так n строк.\n\nСтроки разделяются переносом. В конце переноса нет.\n\nПри n = 3 получается:\n#\n##\n###",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Stairs(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Stairs",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            3
+          ],
+          "expect": "#\n##\n###"
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": "#"
+        },
+        {
+          "args": [
+            4
+          ],
+          "expect": "#\n##\n###\n####"
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": "",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Повторить строку: `new string('#', i)` даёт i решёток подряд.",
+        "Собери строки в `List<string>`, потом склей: `string.Join(\"\\n\", rows)`.",
+        "Это ровно то же, что `\"\\n\".join(...)` в Python."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Stairs(int n)\n    {\n        List<string> rows = new List<string>();\n        for (int i = 1; i <= n; i++)\n        {\n            rows.Add(new string('#', i));\n        }\n        return string.Join(\"\\n\", rows);\n    }\n}\n"
+    }
+  ]
+}

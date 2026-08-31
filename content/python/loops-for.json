@@ -1,0 +1,170 @@
+{
+  "topic": "loops-for",
+  "lang": "python",
+  "order": 3,
+  "title": "Цикл for и range",
+  "subtitle": "повторить одно и то же нужное число раз",
+  "theory": [
+    {
+      "id": "loops-for-t1",
+      "title": "for повторяет код для каждого значения",
+      "text": "`for` берёт значения по одному и для каждого выполняет тело цикла — строки с отступом.\n\nПеременная после `for` меняется сама на каждом шаге. Менять её вручную не нужно.",
+      "code": "for letter in \"кот\":\n    print(letter)\n\nprint(\"готово\")"
+    },
+    {
+      "id": "loops-for-t2",
+      "title": "range задаёт числа для цикла",
+      "text": "`range(5)` даёт числа 0, 1, 2, 3, 4 — пять штук, начиная с нуля и не включая пятёрку.\n\n`range(2, 6)` — от 2 до 5. Правая граница не входит никогда, это главное, что надо запомнить.",
+      "code": "for i in range(5):\n    print(i)\n\nprint(\"---\")\n\nfor i in range(2, 6):\n    print(i)"
+    },
+    {
+      "id": "loops-for-t3",
+      "title": "Третий аргумент — шаг",
+      "text": "`range(старт, стоп, шаг)`. Шаг может быть отрицательным — тогда счёт идёт назад.\n\n`range(10, 0, -1)` даёт 10, 9, 8 и так далее до 1. Ноль не входит, потому что стоп не включается.",
+      "code": "for i in range(0, 10, 2):\n    print(i)\n\nprint(\"---\")\n\nfor i in range(5, 0, -1):\n    print(i)"
+    },
+    {
+      "id": "loops-for-t4",
+      "title": "Копилка: считаем и собираем",
+      "text": "Приём, который дальше встретится сто раз: заводим переменную до цикла и меняем её внутри.\n\nДля суммы это число, для списка — пустой список и `append`, для строки — пустая строка и `+`.",
+      "code": "total = 0\nfor i in range(1, 5):\n    total = total + i\nprint(total)\n\nnumbers = []\nfor i in range(3):\n    numbers.append(i * i)\nprint(numbers)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "loops-for-1",
+      "topic": "loops-for",
+      "title": "Сумма до n",
+      "statement": "Напиши функцию, которая возвращает сумму всех чисел от 1 до n включительно.",
+      "starter": "def sum_to(n):\n    # твой код\n    ",
+      "entry": "sum_to",
+      "tests": [
+        {
+          "args": [
+            5
+          ],
+          "expect": 15
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 1
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 5050
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 0,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи копилку `total = 0` до цикла.",
+        "`range(1, n + 1)` даёт числа от 1 до n включительно.",
+        "Внутри цикла: `total = total + i`. После цикла — `return total`."
+      ],
+      "solution": "def sum_to(n):\n    total = 0\n    for i in range(1, n + 1):\n        total = total + i\n    return total"
+    },
+    {
+      "id": "loops-for-2",
+      "topic": "loops-for",
+      "title": "Обратный отсчёт",
+      "statement": "Напиши функцию, которая по числу n возвращает список чисел от n до 1.",
+      "starter": "def count_down(n):\n    # твой код\n    ",
+      "entry": "count_down",
+      "tests": [
+        {
+          "args": [
+            5
+          ],
+          "expect": [
+            5,
+            4,
+            3,
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": [
+            1
+          ]
+        },
+        {
+          "args": [
+            3
+          ],
+          "expect": [
+            3,
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "range умеет считать назад, если дать ему третий аргумент.",
+        "`range(n, 0, -1)` даёт числа от n до 1.",
+        "Собери их в список: заведи `result = []` и добавляй через `append`."
+      ],
+      "solution": "def count_down(n):\n    result = []\n    for i in range(n, 0, -1):\n        result.append(i)\n    return result"
+    },
+    {
+      "id": "loops-for-3",
+      "topic": "loops-for",
+      "title": "Лесенка",
+      "statement": "Напиши функцию, которая возвращает лесенку из решёток: в первой строке одна решётка, во второй две, и так n строк.\n\nСтроки разделяются переносом. В конце переноса нет.\n\nПри n = 3 получается:\n#\n##\n###",
+      "starter": "def stairs(n):\n    # твой код\n    ",
+      "entry": "stairs",
+      "tests": [
+        {
+          "args": [
+            3
+          ],
+          "expect": "#\n##\n###"
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": "#"
+        },
+        {
+          "args": [
+            4
+          ],
+          "expect": "#\n##\n###\n####"
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": "",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Строку можно повторить умножением: `\"#\" * 3` даёт `###`.",
+        "Собери строки в список, а потом склей их через `\"\\n\".join(...)`.",
+        "Так перенос окажется только между строками, а не в конце."
+      ],
+      "solution": "def stairs(n):\n    rows = []\n    for i in range(1, n + 1):\n        rows.append(\"#\" * i)\n    return \"\\n\".join(rows)"
+    }
+  ]
+}

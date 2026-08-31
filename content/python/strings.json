@@ -1,0 +1,162 @@
+{
+  "topic": "strings",
+  "lang": "python",
+  "order": 6,
+  "title": "Строки",
+  "subtitle": "текст по символам",
+  "theory": [
+    {
+      "id": "strings-t1",
+      "title": "Строка — тоже последовательность",
+      "text": "Со строкой работает всё то же, что со списком: `len(...)`, обращение по номеру, перебор циклом, проверка `in`.\n\nОтличие одно: строку нельзя изменить на месте. Можно только собрать новую.",
+      "code": "text = \"привет\"\n\nprint(len(text))\nprint(text[0])\nprint(text[len(text) - 1])\nprint(\"ив\" in text)\n\nfor letter in text:\n    print(letter)"
+    },
+    {
+      "id": "strings-t2",
+      "title": "Регистр и поиск",
+      "text": "`lower()` даёт строку маленькими буквами, `upper()` — большими. Сама строка не меняется, возвращается новая.\n\nПриводить к одному регистру нужно почти всегда, когда что-то ищешь в тексте: иначе «А» и «а» окажутся разными.",
+      "code": "text = \"Привет, Мир\"\n\nprint(text.lower())\nprint(text.upper())\nprint(text)\n\nprint(\"мир\" in text)\nprint(\"мир\" in text.lower())"
+    },
+    {
+      "id": "strings-t3",
+      "title": "Собираем новую строку",
+      "text": "Заводим пустую строку до цикла и прибавляем к ней символы внутри. Это та же копилка, что была с числами.\n\nПрибавление слева даёт разворот строки — почти бесплатно.",
+      "code": "text = \"кот\"\n\nresult = \"\"\nfor letter in text:\n    result = result + letter + \"-\"\nprint(result)\n\nback = \"\"\nfor letter in text:\n    back = letter + back\nprint(back)"
+    },
+    {
+      "id": "strings-t4",
+      "title": "Буква и её номер",
+      "text": "`ord(\"a\")` даёт номер символа в таблице, `chr(97)` — обратно символ по номеру.\n\nЛатинские буквы идут подряд, поэтому «сдвинуть букву на 3» — это арифметика: взять номер, прибавить, вернуть символ. На этом стоит шифр Цезаря.",
+      "code": "print(ord(\"a\"))\nprint(ord(\"b\"))\nprint(chr(97))\n\nletter = \"a\"\nshifted = chr(ord(letter) + 3)\nprint(shifted)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "strings-1",
+      "topic": "strings",
+      "title": "Задом наперёд",
+      "statement": "Напиши функцию, которая возвращает строку, записанную задом наперёд.",
+      "starter": "def reverse(text):\n    # твой код\n    ",
+      "entry": "reverse",
+      "tests": [
+        {
+          "args": [
+            "привет"
+          ],
+          "expect": "тевирп"
+        },
+        {
+          "args": [
+            "кот"
+          ],
+          "expect": "ток"
+        },
+        {
+          "args": [
+            "a"
+          ],
+          "expect": "a"
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": "",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи пустую строку `result = \"\"` до цикла.",
+        "Перебирай символы и приписывай каждый **слева**: `result = letter + result`.",
+        "Тогда последний символ окажется первым."
+      ],
+      "solution": "def reverse(text):\n    result = \"\"\n    for letter in text:\n        result = letter + result\n    return result"
+    },
+    {
+      "id": "strings-2",
+      "topic": "strings",
+      "title": "Сколько гласных",
+      "statement": "Напиши функцию, которая считает гласные в тексте — русские и английские.\n\nРусские гласные: а е ё и о у ы э ю я. Английские: a e i o u.\n\nБольшие и маленькие буквы считаются одинаково.",
+      "starter": "def count_vowels(text):\n    # твой код\n    ",
+      "entry": "count_vowels",
+      "tests": [
+        {
+          "args": [
+            "Привет"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            "Hello"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            "Ёжик"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": 0,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Сложи все гласные в одну строку и проверяй `if letter in vowels`.",
+        "Приведи текст к маленьким буквам через `lower()`, иначе «Ё» не найдётся.",
+        "vowels = \"аеёиоуыэюяaeiou\" — и обычная копилка-счётчик."
+      ],
+      "solution": "def count_vowels(text):\n    vowels = \"аеёиоуыэюяaeiou\"\n    count = 0\n    for letter in text.lower():\n        if letter in vowels:\n            count = count + 1\n    return count"
+    },
+    {
+      "id": "strings-3",
+      "topic": "strings",
+      "title": "Шифр Цезаря",
+      "statement": "Продолжение вашего модуля «Этичный хакинг».\n\nНапиши функцию, которая сдвигает каждую английскую букву на shift позиций по алфавиту. После «z» счёт идёт снова с «a».\n\nРегистр сохраняется. Всё, что не английская буква — пробелы, запятые, цифры — остаётся как было.",
+      "starter": "def caesar(text, shift):\n    # твой код\n    ",
+      "entry": "caesar",
+      "tests": [
+        {
+          "args": [
+            "abc",
+            1
+          ],
+          "expect": "bcd"
+        },
+        {
+          "args": [
+            "XYZ",
+            3
+          ],
+          "expect": "ABC"
+        },
+        {
+          "args": [
+            "Hello, World!",
+            5
+          ],
+          "expect": "Mjqqt, Btwqi!"
+        },
+        {
+          "args": [
+            "abc",
+            0
+          ],
+          "expect": "abc",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Проверить, что буква маленькая английская: `\"a\" <= letter <= \"z\"`.",
+        "Сдвиг с переходом через конец: `(ord(letter) - ord(\"a\") + shift) % 26`.",
+        "К результату прибавь `ord(\"a\")` и верни символ через `chr(...)`. Для больших букв то же самое, но с «A»."
+      ],
+      "solution": "def caesar(text, shift):\n    result = \"\"\n    for letter in text:\n        if \"a\" <= letter <= \"z\":\n            result = result + chr((ord(letter) - ord(\"a\") + shift) % 26 + ord(\"a\"))\n        elif \"A\" <= letter <= \"Z\":\n            result = result + chr((ord(letter) - ord(\"A\") + shift) % 26 + ord(\"A\"))\n        else:\n            result = result + letter\n    return result"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Терминал — таблица группы</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="board-body">
+
+<header class="board-head">
+  <div class="mark">
+    <span class="mark-glyph">&gt;_</span>
+    <span class="mark-word">Терминал</span>
+    <span class="mark-lang" id="board-lang">python</span>
+  </div>
+  <div class="board-title">Движение группы</div>
+  <div class="spacer"></div>
+  <div class="board-where" id="board-where"></div>
+  <div class="board-total" id="board-total"></div>
+</header>
+
+<main class="board-main">
+  <div class="board-legend" id="board-legend"></div>
+  <div class="board-rows" id="board-rows"></div>
+  <div class="board-empty" id="board-empty" hidden>
+    Пока никто не подключился.
+    <span class="board-empty-sub" id="board-empty-sub"></span>
+  </div>
+</main>
+
+<footer class="board-foot">
+  <div class="board-keys" id="board-keys"></div>
+  <div class="spacer"></div>
+  <div class="board-link" id="board-status"></div>
+</footer>
+
+<script src="/net.js"></script>
+<script src="/board.js"></script>
+</body>
+</html>

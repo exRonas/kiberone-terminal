@@ -1,0 +1,10 @@
+# База живёт два занятия и в репозиторий не едет
+server/terminal.sqlite3
+server/terminal.sqlite3-wal
+server/terminal.sqlite3-shm
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/

@@ -1,0 +1,196 @@
+{
+  "topic": "conditions",
+  "lang": "csharp",
+  "order": 2,
+  "title": "Условия",
+  "subtitle": "условие в скобках, && вместо and",
+  "theory": [
+    {
+      "id": "cs-conditions-t1",
+      "title": "Условие берут в круглые скобки",
+      "text": "`if score >= 85:` превращается в `if (score >= 85)`. Круглые скобки обязательны, двоеточие не нужно.\n\nСами знаки сравнения те же: `>`, `<`, `>=`, `<=`, `==`, `!=`.\n\nТип «да/нет» называется `bool`, а значения пишутся с маленькой буквы: `true` и `false`, а не `True` и `False`.",
+      "code": "Console.WriteLine(5 > 3);\nConsole.WriteLine(5 == 5);\nConsole.WriteLine(\"кот\" == \"Кот\");\n\nConsole.WriteLine(10 % 3);\nConsole.WriteLine(10 % 3 == 1);",
+      "code_python": "print(5 > 3)\nprint(5 == 5)\nprint(\"кот\" == \"Кот\")\n\nprint(10 % 3)\nprint(10 % 3 == 1)"
+    },
+    {
+      "id": "cs-conditions-t2",
+      "title": "else if вместо elif",
+      "text": "В C# нет отдельного слова `elif` — пишут `else if` в два слова.\n\nПроверки идут сверху вниз точно так же: сработала первая — остальные не проверяются.\n\nЕсли внутри ветки одна команда, скобки можно не ставить. Но лучше ставить всегда: так не сломается, когда добавишь вторую строку.",
+      "code": "int score = 72;\n\nif (score >= 85)\n{\n    Console.WriteLine(\"отлично\");\n}\nelse if (score >= 70)\n{\n    Console.WriteLine(\"хорошо\");\n}\nelse if (score >= 50)\n{\n    Console.WriteLine(\"удовлетворительно\");\n}\nelse\n{\n    Console.WriteLine(\"плохо\");\n}",
+      "code_python": "score = 72\n\nif score >= 85:\n    print(\"отлично\")\nelif score >= 70:\n    print(\"хорошо\")\nelif score >= 50:\n    print(\"удовлетворительно\")\nelse:\n    print(\"плохо\")"
+    },
+    {
+      "id": "cs-conditions-t3",
+      "title": "&& и || вместо and и or",
+      "text": "`and` становится `&&`, `or` становится `||`, `not` становится `!`.\n\nСмысл тот же, набор символов другой. Одиночные `&` и `|` в C# тоже есть, но означают другое — пишите двойные.",
+      "code": "int age = 13;\nbool hasTicket = true;\n\nif (age >= 12 && hasTicket)\n{\n    Console.WriteLine(\"Проходи\");\n}\n\nif (!hasTicket)\n{\n    Console.WriteLine(\"Нужен билет\");\n}",
+      "code_python": "age = 13\nhas_ticket = True\n\nif age >= 12 and has_ticket:\n    print(\"Проходи\")\n\nif not has_ticket:\n    print(\"Нужен билет\")"
+    },
+    {
+      "id": "cs-conditions-t4",
+      "title": "Сравнение можно сразу вернуть",
+      "text": "Как и в Python, результат сравнения — готовое значение, его не надо оборачивать в `if`.\n\nТолько тип теперь объявлен явно: `static bool IsBig(int x)` обещает вернуть `bool`, и компилятор проследит, чтобы обещание выполнили.",
+      "code": "static bool IsBig(int x)\n{\n    return x > 100;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(IsBig(250));\n    Console.WriteLine(IsBig(7));\n}",
+      "code_python": "def is_big(x):\n    return x > 100\n\n\nprint(is_big(250))\nprint(is_big(7))"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "conditions-1",
+      "topic": "conditions",
+      "title": "Чётное или нет",
+      "statement": "Напиши функцию, которая по числу n возвращает True, если оно чётное, и False, если нечётное.\n\nНичего печатать не нужно — именно вернуть через return.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsEven(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "IsEven",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "bool"
+      },
+      "tests": [
+        {
+          "args": [
+            4
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            7
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": true,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Чётное число делится на 2 без остатка, остаток даёт знак `%`.",
+        "В C# «да/нет» пишется `true` и `false`, с маленькой буквы.",
+        "return n % 2 == 0;  — if здесь не нужен."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsEven(int n)\n    {\n        return n % 2 == 0;\n    }\n}\n"
+    },
+    {
+      "id": "conditions-2",
+      "topic": "conditions",
+      "title": "Наибольшее из трёх",
+      "statement": "Напиши функцию, которая получает три числа и возвращает наибольшее из них.\n\nВстроенной max() пользоваться нельзя — вся задача в том, чтобы сравнить самому.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int MaxOfThree(int a, int b, int c)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "MaxOfThree",
+      "signature": {
+        "args": [
+          "int",
+          "int",
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            3,
+            9,
+            5
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            10,
+            2,
+            4
+          ],
+          "expect": 10
+        },
+        {
+          "args": [
+            -7,
+            -2,
+            -9
+          ],
+          "expect": -2
+        },
+        {
+          "args": [
+            7,
+            7,
+            7
+          ],
+          "expect": 7,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи переменную `int biggest = a;` и обновляй её.",
+        "Условие берётся в круглые скобки: `if (b > biggest)`.",
+        "В конце обязательно `return biggest;` — иначе компилятор скажет CS0161."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int MaxOfThree(int a, int b, int c)\n    {\n        int biggest = a;\n        if (b > biggest)\n        {\n            biggest = b;\n        }\n        if (c > biggest)\n        {\n            biggest = c;\n        }\n        return biggest;\n    }\n}\n"
+    },
+    {
+      "id": "conditions-3",
+      "topic": "conditions",
+      "title": "Оценка по баллам",
+      "statement": "Напиши функцию, которая по числу баллов возвращает оценку словом:\n\n85 и выше — «отлично»\nот 70 до 84 — «хорошо»\nот 50 до 69 — «удовлетворительно»\nниже 50 — «плохо»\n\nСлова возвращай точно так, маленькими буквами и без кавычек внутри.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Grade(int score)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Grade",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            95
+          ],
+          "expect": "отлично"
+        },
+        {
+          "args": [
+            72
+          ],
+          "expect": "хорошо"
+        },
+        {
+          "args": [
+            55
+          ],
+          "expect": "удовлетворительно"
+        },
+        {
+          "args": [
+            30
+          ],
+          "expect": "плохо"
+        },
+        {
+          "args": [
+            70
+          ],
+          "expect": "хорошо",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Четыре варианта: `if`, два `else if` и `else`.",
+        "Начни с самого большого порога — 85.",
+        "Граница входит в диапазон, значит знак `>=`, а не `>`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Grade(int score)\n    {\n        if (score >= 85)\n        {\n            return \"отлично\";\n        }\n        else if (score >= 70)\n        {\n            return \"хорошо\";\n        }\n        else if (score >= 50)\n        {\n            return \"удовлетворительно\";\n        }\n        else\n        {\n            return \"плохо\";\n        }\n    }\n}\n"
+    }
+  ]
+}

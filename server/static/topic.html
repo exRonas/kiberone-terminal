@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Терминал — KIBERone</title>
+<link rel="stylesheet" href="vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="boot" class="boot">
+  Поднимаю терминал…
+  <div class="boot-bar"></div>
+</div>
+
+<div id="page" hidden>
+
+  <header class="rail">
+    <div class="mark">
+      <span class="mark-glyph">&gt;_</span>
+      <span class="mark-word">Терминал</span>
+      <span class="mark-lang" id="mark-lang">python</span>
+    </div>
+
+    <div class="rail-topic" id="rail-topic"></div>
+
+    <div class="spacer"></div>
+
+    <div class="course">
+      <span class="tag">Курс</span>
+      <div class="course-meter" id="course" aria-label="Прогресс по восьми темам"></div>
+      <div class="course-count" id="course-count"></div>
+    </div>
+
+    <div class="who" id="who" hidden></div>
+    <div id="rail-status"></div>
+  </header>
+
+  <main class="main">
+
+    <section class="col col-theory" aria-label="Теория и своё решение">
+      <div class="panel panel-compare" id="compare-panel" hidden>
+        <div class="panel-head">
+          <span class="tag">Твой Python</span>
+          <span class="panel-note" id="compare-note"></span>
+        </div>
+        <textarea id="compare-code"></textarea>
+      </div>
+
+      <div class="col-head">
+        <span class="tag">Теория</span>
+        <span class="col-note" id="theory-note"></span>
+      </div>
+      <ol class="trace" id="theory"></ol>
+    </section>
+
+    <section class="col col-task" aria-label="Задача">
+      <div class="col-head">
+        <span class="tag">Задача</span>
+        <div class="tasknav" id="tasknav" role="tablist"></div>
+      </div>
+
+      <div class="brief">
+        <h1 class="brief-title" id="task-title"></h1>
+        <div class="brief-text" id="task-statement"></div>
+      </div>
+
+      <div class="panel panel-editor">
+        <div class="panel-head">
+          <span class="tag">Редактор</span>
+          <span class="panel-note">Ctrl + Enter — проверить</span>
+        </div>
+        <textarea id="editor"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-go" id="check-btn" type="button">Проверить</button>
+        <button class="btn" id="reset-btn" type="button">Сбросить</button>
+        <button class="btn btn-sm" id="hint-btn" type="button">Подсказка</button>
+        <span class="bar-note" id="hint-cost"></span>
+      </div>
+
+      <div class="latch" id="latch">
+        <div class="latch-mark">&#10003;</div>
+        <div>
+          <div class="latch-title">Задача сдана</div>
+          <div class="latch-sub" id="latch-sub"></div>
+        </div>
+        <button class="btn btn-sm latch-next" id="latch-next" type="button" hidden>Следующая задача</button>
+      </div>
+
+      <div class="verdict" id="verdict"></div>
+
+      <div class="hints" id="hints"></div>
+
+      <div class="panel panel-tests" id="tests-panel">
+        <div class="panel-head">
+          <span class="tag">Тесты</span>
+          <span class="tests-score" id="tests-score"></span>
+          <span class="build-time" id="build-time" hidden></span>
+        </div>
+        <div class="tests" id="tests"></div>
+        <div class="scan" id="scan"></div>
+      </div>
+
+      <div class="panel" id="stdout-panel" hidden>
+        <div class="panel-head">
+          <span class="tag">Что напечатала программа</span>
+        </div>
+        <pre class="stdout" id="stdout"></pre>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="vendor/skulpt/skulpt.min.js"></script>
+<script src="vendor/skulpt/skulpt-stdlib.js"></script>
+<script src="vendor/codemirror/codemirror.js"></script>
+<script src="vendor/codemirror/mode/python/python.js"></script>
+<script src="vendor/codemirror/mode/clike/clike.js"></script>
+<script src="vendor/codemirror/matchbrackets.js"></script>
+<script src="vendor/codemirror/active-line.js"></script>
+<script src="/net.js"></script>
+<script src="runner.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+{
+  "topic": "dicts",
+  "lang": "python",
+  "order": 8,
+  "title": "Словари",
+  "subtitle": "значение по ключу, а не по номеру",
+  "theory": [
+    {
+      "id": "dicts-t1",
+      "title": "Словарь ищет по ключу",
+      "text": "В списке значение достают по номеру. В словаре — по ключу, и ключом может быть строка.\n\nПишут в фигурных скобках, пары `ключ: значение` через запятую.",
+      "code": "scores = {\"Аня\": 8, \"Боря\": 5}\n\nprint(scores[\"Аня\"])\nprint(len(scores))\nprint(\"Боря\" in scores)"
+    },
+    {
+      "id": "dicts-t2",
+      "title": "Добавить и изменить — одна и та же запись",
+      "text": "`d[ключ] = значение` создаёт пару, если ключа не было, и заменяет значение, если был.\n\nОбращение к несуществующему ключу — ошибка. Поэтому перед чтением либо проверяют `in`, либо берут `d.get(ключ, значение_по_умолчанию)`.",
+      "code": "scores = {}\nscores[\"Аня\"] = 8\nscores[\"Аня\"] = 10\nscores[\"Боря\"] = 5\nprint(scores)\n\nprint(scores.get(\"Вика\", 0))"
+    },
+    {
+      "id": "dicts-t3",
+      "title": "Перебор словаря",
+      "text": "`for key in d` даёт ключи. Значение берут как `d[key]`.\n\nЕсли нужны сразу оба, используют `d.items()`.",
+      "code": "scores = {\"Аня\": 8, \"Боря\": 5, \"Вика\": 9}\n\nfor name in scores:\n    print(name, scores[name])\n\nprint(\"---\")\n\nfor name, value in scores.items():\n    print(name, \"->\", value)"
+    },
+    {
+      "id": "dicts-t4",
+      "title": "Словарь как счётчик",
+      "text": "Главное применение словаря: посчитать, сколько раз что встретилось.\n\nСхема всегда одна: если ключа ещё нет — кладём 1, если есть — прибавляем 1. Короче это пишут через `get` с нулём по умолчанию.",
+      "code": "text = \"мама\"\ncount = {}\n\nfor letter in text:\n    count[letter] = count.get(letter, 0) + 1\n\nprint(count)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "dicts-1",
+      "topic": "dicts",
+      "title": "Сколько каких букв",
+      "statement": "Напиши функцию, которая считает, сколько раз встретился каждый символ, и возвращает словарь «символ → сколько раз».\n\nПробелы не считаются. Большие и маленькие буквы считаются одинаково, в ответе — маленькие.",
+      "starter": "def count_letters(text):\n    # твой код\n    ",
+      "entry": "count_letters",
+      "tests": [
+        {
+          "args": [
+            "мама"
+          ],
+          "expect": {
+            "м": 2,
+            "а": 2
+          }
+        },
+        {
+          "args": [
+            "Ok ok"
+          ],
+          "expect": {
+            "o": 2,
+            "k": 2
+          }
+        },
+        {
+          "args": [
+            "аб аб"
+          ],
+          "expect": {
+            "а": 2,
+            "б": 2
+          }
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": {},
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Приведи текст к маленьким буквам через `lower()`.",
+        "Пробел пропускается проверкой `if letter != \" \"`.",
+        "Считай через `count[letter] = count.get(letter, 0) + 1`."
+      ],
+      "solution": "def count_letters(text):\n    count = {}\n    for letter in text.lower():\n        if letter != \" \":\n            count[letter] = count.get(letter, 0) + 1\n    return count"
+    },
+    {
+      "id": "dicts-2",
+      "topic": "dicts",
+      "title": "Лучший игрок",
+      "statement": "На вход приходит словарь «имя → счёт». Напиши функцию, которая возвращает имя игрока с наибольшим счётом.\n\nСловарь всегда непустой, и лучший всегда один.",
+      "starter": "def best_player(scores):\n    # твой код\n    ",
+      "entry": "best_player",
+      "tests": [
+        {
+          "args": [
+            {
+              "Аня": 5,
+              "Боря": 8
+            }
+          ],
+          "expect": "Боря"
+        },
+        {
+          "args": [
+            {
+              "Аня": 12,
+              "Боря": 8,
+              "Вика": 3
+            }
+          ],
+          "expect": "Аня"
+        },
+        {
+          "args": [
+            {
+              "Ян": 1
+            }
+          ],
+          "expect": "Ян"
+        },
+        {
+          "args": [
+            {
+              "Аня": -2,
+              "Боря": -5
+            }
+          ],
+          "expect": "Аня",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи переменные для лучшего имени и лучшего счёта.",
+        "Начинать с нуля нельзя: счёт бывает отрицательным. Начни с `None`.",
+        "Перебирай `scores.items()` и обновляй обе переменные, когда нашёл больше."
+      ],
+      "solution": "def best_player(scores):\n    best_name = None\n    best_score = None\n    for name, value in scores.items():\n        if best_score is None or value > best_score:\n            best_name = name\n            best_score = value\n    return best_name"
+    },
+    {
+      "id": "dicts-3",
+      "topic": "dicts",
+      "title": "Сложить два счёта",
+      "statement": "Напиши функцию, которая объединяет два словаря «имя → счёт» в один.\n\nЕсли имя встречается в обоих, счета складываются. Исходные словари менять нельзя.",
+      "starter": "def merge_scores(a, b):\n    # твой код\n    ",
+      "entry": "merge_scores",
+      "tests": [
+        {
+          "args": [
+            {
+              "Аня": 1
+            },
+            {
+              "Боря": 2
+            }
+          ],
+          "expect": {
+            "Аня": 1,
+            "Боря": 2
+          }
+        },
+        {
+          "args": [
+            {
+              "Аня": 1
+            },
+            {
+              "Аня": 2
+            }
+          ],
+          "expect": {
+            "Аня": 3
+          }
+        },
+        {
+          "args": [
+            {
+              "Аня": 3,
+              "Боря": 1
+            },
+            {
+              "Боря": 4
+            }
+          ],
+          "expect": {
+            "Аня": 3,
+            "Боря": 5
+          }
+        },
+        {
+          "args": [
+            {},
+            {
+              "Ян": 9
+            }
+          ],
+          "expect": {
+            "Ян": 9
+          },
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи пустой словарь для ответа и сложи в него сначала всё из a.",
+        "Потом пройди b и прибавляй: `result[name] = result.get(name, 0) + value`.",
+        "Так общие ключи сложатся сами, а новые просто добавятся."
+      ],
+      "solution": "def merge_scores(a, b):\n    result = {}\n    for name, value in a.items():\n        result[name] = result.get(name, 0) + value\n    for name, value in b.items():\n        result[name] = result.get(name, 0) + value\n    return result"
+    }
+  ]
+}

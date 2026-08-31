@@ -1,0 +1,246 @@
+{
+  "topic": "lists",
+  "lang": "csharp",
+  "order": 5,
+  "title": "Списки",
+  "subtitle": "массив и List<int>",
+  "theory": [
+    {
+      "id": "cs-lists-t1",
+      "title": "Массив и список — разные вещи",
+      "text": "В Python список один на все случаи. В C# их два.\n\n`int[]` — массив: длина задаётся при создании и больше не меняется. Быстрый, но добавить элемент нельзя.\n\n`List<int>` — список: умеет `Add`, растёт по мере надобности. Им пользуются почти всегда.\n\nДлина у массива — `Length`, у списка — `Count`. Нумерация с нуля, как в Python.",
+      "code": "int[] numbers = new int[] { 10, 20, 30 };\nConsole.WriteLine(numbers[0]);\nConsole.WriteLine(numbers.Length);\n\nList<int> items = new List<int>();\nitems.Add(10);\nitems.Add(20);\nConsole.WriteLine(items[1]);\nConsole.WriteLine(items.Count);",
+      "code_python": "numbers = [10, 20, 30]\nprint(numbers[0])\nprint(len(numbers))\n\nitems = []\nitems.append(10)\nitems.append(20)\nprint(items[1])\nprint(len(items))"
+    },
+    {
+      "id": "cs-lists-t2",
+      "title": "Перебор и поиск",
+      "text": "`foreach` перебирает элементы, обычный `for` — если нужен номер.\n\nПитоновское `x in items` превращается в `items.Contains(x)`. Это метод, а не отдельное слово языка.",
+      "code": "List<int> items = new List<int> { 4, 8, 15 };\n\nforeach (int x in items)\n{\n    Console.WriteLine(x);\n}\n\nConsole.WriteLine(\"---\");\n\nfor (int i = 0; i < items.Count; i++)\n{\n    Console.WriteLine(i + \" -> \" + items[i]);\n}\n\nConsole.WriteLine(items.Contains(8));",
+      "code_python": "items = [4, 8, 15]\n\nfor x in items:\n    print(x)\n\nprint(\"---\")\n\nfor i in range(len(items)):\n    print(i, \"->\", items[i])\n\nprint(8 in items)"
+    },
+    {
+      "id": "cs-lists-t3",
+      "title": "Сортировка меняет список на месте",
+      "text": "Главное отличие от Python. `sorted(items)` возвращает **новый** список и не трогает старый. `items.Sort()` в C# ничего не возвращает — он переставляет элементы **в самом** списке.\n\nПоэтому писать `list = list.Sort();` бессмысленно: получишь ошибку. Просто `list.Sort();` — и список отсортирован.\n\nОбратный порядок: сначала `Sort()`, потом `Reverse()`.",
+      "code": "List<int> numbers = new List<int> { 5, 1, 9, 3 };\n\nnumbers.Sort();\nConsole.WriteLine(string.Join(\", \", numbers));\n\nnumbers.Reverse();\nConsole.WriteLine(string.Join(\", \", numbers));",
+      "code_python": "numbers = [5, 1, 9, 3]\n\nnumbers = sorted(numbers)\nprint(numbers)\n\nnumbers = sorted(numbers, reverse=True)\nprint(numbers)"
+    },
+    {
+      "id": "cs-lists-t4",
+      "title": "Срезов нет, есть GetRange",
+      "text": "Питоновский срез `items[:3]` в C# так не пишется. Ближайшее — `items.GetRange(0, 3)`: откуда начать и сколько взять.\n\nВажно: если попросить больше, чем есть, GetRange упадёт с ошибкой. Поэтому длину проверяют заранее — например, через `Math.Min`.",
+      "code": "List<int> numbers = new List<int> { 9, 7, 5, 3, 1 };\n\nList<int> firstThree = numbers.GetRange(0, 3);\nConsole.WriteLine(string.Join(\", \", firstThree));\n\nint howMany = Math.Min(3, numbers.Count);\nConsole.WriteLine(howMany);",
+      "code_python": "numbers = [9, 7, 5, 3, 1]\n\nfirst_three = numbers[:3]\nprint(first_three)\n\nhow_many = min(3, len(numbers))\nprint(how_many)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "lists-1",
+      "topic": "lists",
+      "title": "Максимум своими руками",
+      "statement": "Напиши функцию, которая возвращает наибольшее число списка.\n\nВстроенной `max()` пользоваться нельзя — задача в том, чтобы пройти список самому.\n\nСписок всегда непустой.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int FindMax(int[] numbers)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "FindMax",
+      "signature": {
+        "args": [
+          "int[]"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            [
+              3,
+              9,
+              5
+            ]
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            [
+              -4,
+              -9,
+              -1
+            ]
+          ],
+          "expect": -1
+        },
+        {
+          "args": [
+            [
+              7
+            ]
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            [
+              2,
+              2,
+              2
+            ]
+          ],
+          "expect": 2,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Начни с первого элемента: `int biggest = numbers[0];`.",
+        "Перебери массив через `foreach (int x in numbers)`.",
+        "С нуля начинать нельзя: числа бывают отрицательными."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int FindMax(int[] numbers)\n    {\n        int biggest = numbers[0];\n        foreach (int x in numbers)\n        {\n            if (x > biggest)\n            {\n                biggest = x;\n            }\n        }\n        return biggest;\n    }\n}\n"
+    },
+    {
+      "id": "lists-2",
+      "topic": "lists",
+      "title": "Убрать повторы",
+      "statement": "Напиши функцию, которая возвращает список чисел без повторов.\n\nПорядок должен сохраниться: остаётся первое появление каждого значения.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] RemoveDuplicates(int[] items)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "RemoveDuplicates",
+      "signature": {
+        "args": [
+          "int[]"
+        ],
+        "ret": "int[]"
+      },
+      "tests": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              2,
+              3,
+              1
+            ]
+          ],
+          "expect": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "args": [
+            [
+              7,
+              7,
+              8
+            ]
+          ],
+          "expect": [
+            7,
+            8
+          ]
+        },
+        {
+          "args": [
+            [
+              5,
+              5,
+              5
+            ]
+          ],
+          "expect": [
+            5
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Собирай ответ в `List<int> result = new List<int>();`.",
+        "Проверка «уже есть» — это `result.Contains(x)`, а не `not in`.",
+        "В конце `return result.ToArray();` — тип ответа `int[]`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] RemoveDuplicates(int[] items)\n    {\n        List<int> result = new List<int>();\n        foreach (int x in items)\n        {\n            if (!result.Contains(x))\n            {\n                result.Add(x);\n            }\n        }\n        return result.ToArray();\n    }\n}\n"
+    },
+    {
+      "id": "lists-3",
+      "topic": "lists",
+      "title": "Три наибольших",
+      "statement": "Напиши функцию, которая возвращает три наибольших числа по убыванию.\n\nЕсли чисел меньше трёх — верни все, тоже по убыванию.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] Top3(int[] numbers)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Top3",
+      "signature": {
+        "args": [
+          "int[]"
+        ],
+        "ret": "int[]"
+      },
+      "tests": [
+        {
+          "args": [
+            [
+              5,
+              1,
+              9,
+              3,
+              7
+            ]
+          ],
+          "expect": [
+            9,
+            7,
+            5
+          ]
+        },
+        {
+          "args": [
+            [
+              4,
+              4,
+              4,
+              4
+            ]
+          ],
+          "expect": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expect": [
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            [
+              8
+            ]
+          ],
+          "expect": [
+            8
+          ],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Скопируй массив в список: `List<int> sorted = new List<int>(numbers);`.",
+        "`sorted.Sort();` сортирует по возрастанию прямо в списке, потом `sorted.Reverse();`.",
+        "Сколько брать, посчитай через `Math.Min(3, sorted.Count)` — иначе GetRange упадёт на коротком массиве."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int[] Top3(int[] numbers)\n    {\n        List<int> sorted = new List<int>(numbers);\n        sorted.Sort();\n        sorted.Reverse();\n        int howMany = Math.Min(3, sorted.Count);\n        return sorted.GetRange(0, howMany).ToArray();\n    }\n}\n"
+    }
+  ]
+}

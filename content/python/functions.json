@@ -1,0 +1,188 @@
+{
+  "topic": "functions",
+  "lang": "python",
+  "order": 7,
+  "title": "Функции",
+  "subtitle": "то, что раньше было рамкой",
+  "theory": [
+    {
+      "id": "functions-t1",
+      "title": "Параметры — то, что приходит снаружи",
+      "text": "Имена в скобках после `def` — параметры. Это обычные переменные, которые получают значения в момент вызова.\n\nЖивут они только внутри функции. Снаружи их не видно, и это хорошо: две функции могут спокойно называть свои переменные одинаково.",
+      "code": "def area(width, height):\n    result = width * height\n    return result\n\n\nprint(area(3, 4))\nprint(area(10, 2))"
+    },
+    {
+      "id": "functions-t2",
+      "title": "return отдаёт значение и заканчивает работу",
+      "text": "Как только выполнился `return`, функция заканчивается — остальные строки не выполнятся.\n\nЭто удобно: часто проще сразу вернуть ответ, чем городить `else`.\n\nЕсли `return` не выполнился ни разу, функция вернёт `None`. Ошибки не будет, но тесты не сойдутся — и это одна из самых частых причин «вроде всё правильно, а не работает».",
+      "code": "def sign(x):\n    if x > 0:\n        return \"плюс\"\n    if x < 0:\n        return \"минус\"\n    return \"ноль\"\n\n\nprint(sign(5))\nprint(sign(-2))\nprint(sign(0))"
+    },
+    {
+      "id": "functions-t3",
+      "title": "Функция вызывает другую функцию",
+      "text": "Главный приём темы. Один раз пишем маленькую функцию, дальше пользуемся ей как готовым кирпичом.\n\nЧинить потом тоже придётся в одном месте, а не в пяти.",
+      "code": "def is_even(n):\n    return n % 2 == 0\n\n\ndef count_even(numbers):\n    count = 0\n    for x in numbers:\n        if is_even(x):\n            count = count + 1\n    return count\n\n\nprint(count_even([1, 2, 3, 4, 6]))"
+    },
+    {
+      "id": "functions-t4",
+      "title": "Одна функция — одно дело",
+      "text": "Если функция делает три вещи сразу, её тяжело и читать, и чинить. Разложи на три маленькие и собери из них главную.\n\nПо именам такой главной функции сразу видно, что она делает: это и есть признак хорошего разбиения.",
+      "code": "def is_long(password):\n    return len(password) >= 8\n\n\ndef has_digit(password):\n    for ch in password:\n        if ch in \"0123456789\":\n            return True\n    return False\n\n\nprint(is_long(\"abc\"))\nprint(has_digit(\"abc1\"))"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "functions-1",
+      "topic": "functions",
+      "title": "Простое ли число",
+      "statement": "Число простое, если делится только на 1 и на себя. 1 простым не считается.\n\nНапиши функцию, которая возвращает True или False.",
+      "starter": "def is_prime(n):\n    # твой код\n    ",
+      "entry": "is_prime",
+      "tests": [
+        {
+          "args": [
+            7
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            9
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            2
+          ],
+          "expect": true,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Числа меньше 2 сразу не простые.",
+        "Перебирай делители от 2 до n - 1 и проверяй остаток `n % d == 0`.",
+        "Нашёл делитель — сразу `return False`. Дошёл до конца цикла — `return True`."
+      ],
+      "solution": "def is_prime(n):\n    if n < 2:\n        return False\n    for d in range(2, n):\n        if n % d == 0:\n            return False\n    return True"
+    },
+    {
+      "id": "functions-2",
+      "topic": "functions",
+      "title": "Все простые до n",
+      "statement": "Напиши функцию, которая возвращает список простых чисел от 2 до n включительно.\n\nОна обязана вызывать твою `is_prime` из прошлой задачи, а не проверять делимость заново. В этом весь смысл задачи.",
+      "starter": "def is_prime(n):\n    # решение из прошлой задачи\n    \n\n\ndef primes_up_to(n):\n    # твой код\n    ",
+      "entry": "primes_up_to",
+      "must_call": [
+        "is_prime"
+      ],
+      "tests": [
+        {
+          "args": [
+            10
+          ],
+          "expect": [
+            2,
+            3,
+            5,
+            7
+          ]
+        },
+        {
+          "args": [
+            2
+          ],
+          "expect": [
+            2
+          ]
+        },
+        {
+          "args": [
+            20
+          ],
+          "expect": [
+            2,
+            3,
+            5,
+            7,
+            11,
+            13,
+            17,
+            19
+          ]
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Сначала перенеси сюда `is_prime` из прошлой задачи целиком.",
+        "Дальше обычный цикл `for i in range(2, n + 1)` и копилка-список.",
+        "Внутри: `if is_prime(i): result.append(i)`."
+      ],
+      "solution": "def is_prime(n):\n    if n < 2:\n        return False\n    for d in range(2, n):\n        if n % d == 0:\n            return False\n    return True\n\n\ndef primes_up_to(n):\n    result = []\n    for i in range(2, n + 1):\n        if is_prime(i):\n            result.append(i)\n    return result"
+    },
+    {
+      "id": "functions-3",
+      "topic": "functions",
+      "title": "Надёжность пароля",
+      "statement": "Пароль проверяется по трём признакам, и каждый вынесен в свою функцию:\n\n`is_long` — длина не меньше 8\n`has_digit` — есть хотя бы одна цифра\n`has_upper` — есть хотя бы одна большая английская буква\n\n`password_strength` считает, сколько признаков выполнено: три — «сильный», два — «средний», меньше двух — «слабый». Она обязана вызывать все три функции.",
+      "starter": "def is_long(password):\n    # твой код\n    \n\n\ndef has_digit(password):\n    # твой код\n    \n\n\ndef has_upper(password):\n    # твой код\n    \n\n\ndef password_strength(password):\n    # твой код\n    ",
+      "entry": "password_strength",
+      "must_call": [
+        "is_long",
+        "has_digit",
+        "has_upper"
+      ],
+      "tests": [
+        {
+          "args": [
+            "abc"
+          ],
+          "expect": "слабый"
+        },
+        {
+          "args": [
+            "abcdefgh"
+          ],
+          "expect": "слабый"
+        },
+        {
+          "args": [
+            "abcdefg1"
+          ],
+          "expect": "средний"
+        },
+        {
+          "args": [
+            "Abcdefg1"
+          ],
+          "expect": "сильный"
+        },
+        {
+          "args": [
+            "ABC1"
+          ],
+          "expect": "средний",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Каждая из трёх маленьких функций возвращает True или False.",
+        "Цифру ищи так: `if ch in \"0123456789\": return True`. Большую букву — `if \"A\" <= ch <= \"Z\"`.",
+        "В `password_strength` заведи счётчик и прибавляй по единице за каждую сработавшую проверку."
+      ],
+      "solution": "def is_long(password):\n    return len(password) >= 8\n\n\ndef has_digit(password):\n    for ch in password:\n        if ch in \"0123456789\":\n            return True\n    return False\n\n\ndef has_upper(password):\n    for ch in password:\n        if \"A\" <= ch <= \"Z\":\n            return True\n    return False\n\n\ndef password_strength(password):\n    score = 0\n    if is_long(password):\n        score = score + 1\n    if has_digit(password):\n        score = score + 1\n    if has_upper(password):\n        score = score + 1\n    if score == 3:\n        return \"сильный\"\n    if score == 2:\n        return \"средний\"\n    return \"слабый\""
+    }
+  ]
+}

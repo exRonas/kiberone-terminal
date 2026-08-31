@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Терминал — тьютору</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="tutor-body">
+
+<header class="rail">
+  <div class="mark">
+    <span class="mark-glyph">&gt;_</span>
+    <span class="mark-word">Терминал</span>
+    <span class="mark-lang" id="tutor-lang">python</span>
+  </div>
+  <div class="rail-topic">Страница тьютора</div>
+  <div class="spacer"></div>
+  <div class="tutor-where" id="tutor-where"></div>
+  <a class="btn btn-sm" href="/board">Таблица на проектор</a>
+</header>
+
+<main class="tutor-main">
+  <section class="tutor-block">
+    <div class="tutor-head">
+      <span class="tag">Кто где сидит</span>
+      <span class="tutor-note">Время видно только здесь. Детям оно не показывается нигде.</span>
+    </div>
+    <div class="tutor-stuck" id="tutor-stuck"></div>
+  </section>
+
+  <section class="tutor-block">
+    <div class="tutor-head">
+      <span class="tag">Прогресс</span>
+      <span class="tutor-note" id="tutor-total"></span>
+    </div>
+    <div class="tutor-rows" id="tutor-rows"></div>
+    <div class="tutor-empty" id="tutor-empty" hidden>Пока никто не подключился.</div>
+  </section>
+</main>
+
+<footer class="board-foot">
+  <div class="board-keys" id="tutor-keys"></div>
+  <div class="spacer"></div>
+  <div class="board-link" id="tutor-status"></div>
+</footer>
+
+<script src="/net.js"></script>
+<script src="/tutor.js"></script>
+</body>
+</html>

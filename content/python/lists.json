@@ -1,0 +1,224 @@
+{
+  "topic": "lists",
+  "lang": "python",
+  "order": 5,
+  "title": "Списки",
+  "subtitle": "много значений в одной переменной",
+  "theory": [
+    {
+      "id": "lists-t1",
+      "title": "Список хранит значения по порядку",
+      "text": "Список пишут в квадратных скобках через запятую. Внутри может быть что угодно: числа, строки, другие списки.\n\nЭлементы нумеруются с нуля. `len(...)` говорит, сколько их всего, поэтому последний элемент — под номером `len(...) - 1`.",
+      "code": "numbers = [10, 20, 30]\n\nprint(numbers)\nprint(numbers[0])\nprint(numbers[2])\nprint(len(numbers))\nprint(numbers[len(numbers) - 1])"
+    },
+    {
+      "id": "lists-t2",
+      "title": "Список можно менять",
+      "text": "`append` добавляет элемент в конец. Обращение по номеру позволяет заменить элемент на месте.\n\nЭтим список отличается от строки: строку изменить нельзя, а список — можно.",
+      "code": "items = []\nitems.append(\"хлеб\")\nitems.append(\"молоко\")\nprint(items)\n\nitems[0] = \"батон\"\nprint(items)\n\nprint(\"молоко\" in items)"
+    },
+    {
+      "id": "lists-t3",
+      "title": "Перебор списка циклом",
+      "text": "`for x in items` даёт сами элементы — это нужно чаще всего.\n\nЕсли нужен ещё и номер, берут `for i in range(len(items))` и обращаются к `items[i]`.",
+      "code": "items = [4, 8, 15]\n\nfor x in items:\n    print(x)\n\nprint(\"---\")\n\nfor i in range(len(items)):\n    print(i, \"->\", items[i])"
+    },
+    {
+      "id": "lists-t4",
+      "title": "Сортировка и копия",
+      "text": "`sorted(items)` возвращает новый отсортированный список, а сам `items` не трогает.\n\nОбратный порядок — `sorted(items, reverse=True)`.\n\nСрез `items[:3]` даёт первые три элемента. Правая граница, как в range, не входит.",
+      "code": "numbers = [5, 1, 9, 3]\n\nprint(sorted(numbers))\nprint(sorted(numbers, reverse=True))\nprint(numbers)\n\nprint(sorted(numbers, reverse=True)[:2])"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "lists-1",
+      "topic": "lists",
+      "title": "Максимум своими руками",
+      "statement": "Напиши функцию, которая возвращает наибольшее число списка.\n\nВстроенной `max()` пользоваться нельзя — задача в том, чтобы пройти список самому.\n\nСписок всегда непустой.",
+      "starter": "def find_max(numbers):\n    # твой код\n    ",
+      "entry": "find_max",
+      "tests": [
+        {
+          "args": [
+            [
+              3,
+              9,
+              5
+            ]
+          ],
+          "expect": 9
+        },
+        {
+          "args": [
+            [
+              -4,
+              -9,
+              -1
+            ]
+          ],
+          "expect": -1
+        },
+        {
+          "args": [
+            [
+              7
+            ]
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            [
+              2,
+              2,
+              2
+            ]
+          ],
+          "expect": 2,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Считай, что пока наибольший — самый первый: `biggest = numbers[0]`.",
+        "Пройди список циклом и сравнивай каждый элемент с `biggest`.",
+        "Начинать с нуля нельзя: список может быть весь из отрицательных чисел."
+      ],
+      "solution": "def find_max(numbers):\n    biggest = numbers[0]\n    for x in numbers:\n        if x > biggest:\n            biggest = x\n    return biggest"
+    },
+    {
+      "id": "lists-2",
+      "topic": "lists",
+      "title": "Убрать повторы",
+      "statement": "Напиши функцию, которая возвращает список чисел без повторов.\n\nПорядок должен сохраниться: остаётся первое появление каждого значения.",
+      "starter": "def remove_duplicates(items):\n    # твой код\n    ",
+      "entry": "remove_duplicates",
+      "tests": [
+        {
+          "args": [
+            [
+              1,
+              2,
+              2,
+              3,
+              1
+            ]
+          ],
+          "expect": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "args": [
+            [
+              7,
+              7,
+              8
+            ]
+          ],
+          "expect": [
+            7,
+            8
+          ]
+        },
+        {
+          "args": [
+            [
+              5,
+              5,
+              5
+            ]
+          ],
+          "expect": [
+            5
+          ]
+        },
+        {
+          "args": [
+            []
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи пустой список для ответа.",
+        "Проверка «уже есть» пишется так: `if x not in result`.",
+        "Если ещё нет — `result.append(x)`. В конце верни `result`."
+      ],
+      "solution": "def remove_duplicates(items):\n    result = []\n    for x in items:\n        if x not in result:\n            result.append(x)\n    return result"
+    },
+    {
+      "id": "lists-3",
+      "topic": "lists",
+      "title": "Три наибольших",
+      "statement": "Напиши функцию, которая возвращает три наибольших числа по убыванию.\n\nЕсли чисел меньше трёх — верни все, тоже по убыванию.",
+      "starter": "def top3(numbers):\n    # твой код\n    ",
+      "entry": "top3",
+      "tests": [
+        {
+          "args": [
+            [
+              5,
+              1,
+              9,
+              3,
+              7
+            ]
+          ],
+          "expect": [
+            9,
+            7,
+            5
+          ]
+        },
+        {
+          "args": [
+            [
+              4,
+              4,
+              4,
+              4
+            ]
+          ],
+          "expect": [
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "args": [
+            [
+              1,
+              2
+            ]
+          ],
+          "expect": [
+            2,
+            1
+          ]
+        },
+        {
+          "args": [
+            [
+              8
+            ]
+          ],
+          "expect": [
+            8
+          ],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "`sorted(numbers, reverse=True)` сразу даёт список по убыванию.",
+        "Первые три элемента — это срез `[:3]`.",
+        "Срез не ругается, если элементов меньше трёх: он вернёт сколько есть."
+      ],
+      "solution": "def top3(numbers):\n    return sorted(numbers, reverse=True)[:3]"
+    }
+  ]
+}

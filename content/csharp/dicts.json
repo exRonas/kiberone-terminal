@@ -1,0 +1,231 @@
+{
+  "topic": "dicts",
+  "lang": "csharp",
+  "order": 8,
+  "title": "Словари",
+  "subtitle": "Dictionary вместо словаря",
+  "theory": [
+    {
+      "id": "cs-dicts-t1",
+      "title": "Типы ключа и значения объявляют заранее",
+      "text": "Питоновский словарь берёт любые ключи. В C# типы фиксируются при создании: `Dictionary<string, int>` — ключи строки, значения целые.\n\nСоздать: `new Dictionary<string, int>()`. Дальше всё привычно: `scores[\"Аня\"]`.\n\nСколько пар внутри — `Count`, а не `len`.",
+      "code": "Dictionary<string, int> scores = new Dictionary<string, int>();\nscores[\"Аня\"] = 8;\nscores[\"Боря\"] = 5;\n\nConsole.WriteLine(scores[\"Аня\"]);\nConsole.WriteLine(scores.Count);\nConsole.WriteLine(scores.ContainsKey(\"Боря\"));",
+      "code_python": "scores = {}\nscores[\"Аня\"] = 8\nscores[\"Боря\"] = 5\n\nprint(scores[\"Аня\"])\nprint(len(scores))\nprint(\"Боря\" in scores)"
+    },
+    {
+      "id": "cs-dicts-t2",
+      "title": "ContainsKey вместо in",
+      "text": "Проверка «есть ли такой ключ» — это `ContainsKey`. Обращение к несуществующему ключу так же роняет программу, как в Python.\n\nАналога `d.get(ключ, 0)` в чистом виде нет, поэтому пишут проверку через `if (d.ContainsKey(k))` — либо `TryGetValue`, но его разберём позже.",
+      "code": "Dictionary<string, int> scores = new Dictionary<string, int>();\nscores[\"Аня\"] = 8;\n\nif (scores.ContainsKey(\"Вика\"))\n{\n    Console.WriteLine(scores[\"Вика\"]);\n}\nelse\n{\n    Console.WriteLine(0);\n}",
+      "code_python": "scores = {}\nscores[\"Аня\"] = 8\n\nprint(scores.get(\"Вика\", 0))"
+    },
+    {
+      "id": "cs-dicts-t3",
+      "title": "Перебор даёт пары",
+      "text": "`foreach` по словарю выдаёт пары. У каждой есть `Key` и `Value` — это замена питоновскому `for name, value in d.items()`.\n\nТип пары длинный, поэтому здесь удобно писать `var`: компилятор сам поймёт, что это за тип. Слово `var` не делает переменную «без типа» — тип просто выводится автоматически.",
+      "code": "Dictionary<string, int> scores = new Dictionary<string, int>();\nscores[\"Аня\"] = 8;\nscores[\"Боря\"] = 5;\n\nforeach (var pair in scores)\n{\n    Console.WriteLine(pair.Key + \" -> \" + pair.Value);\n}\n\nforeach (string name in scores.Keys)\n{\n    Console.WriteLine(name);\n}",
+      "code_python": "scores = {\"Аня\": 8, \"Боря\": 5}\n\nfor name, value in scores.items():\n    print(name, \"->\", value)\n\nfor name in scores:\n    print(name)"
+    },
+    {
+      "id": "cs-dicts-t4",
+      "title": "Словарь как счётчик",
+      "text": "Схема та же, но `get` с нулём по умолчанию заменяется явной проверкой.\n\nЕсли ключ уже есть — прибавляем единицу, если нет — кладём единицу. Две строки вместо одной, зато видно, что происходит.",
+      "code": "string text = \"мама\";\nDictionary<string, int> count = new Dictionary<string, int>();\n\nforeach (char letter in text)\n{\n    string key = letter.ToString();\n    if (count.ContainsKey(key))\n    {\n        count[key] = count[key] + 1;\n    }\n    else\n    {\n        count[key] = 1;\n    }\n}\n\nforeach (var pair in count)\n{\n    Console.WriteLine(pair.Key + \": \" + pair.Value);\n}",
+      "code_python": "text = \"мама\"\ncount = {}\n\nfor letter in text:\n    count[letter] = count.get(letter, 0) + 1\n\nprint(count)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "dicts-1",
+      "topic": "dicts",
+      "title": "Сколько каких букв",
+      "statement": "Напиши функцию, которая считает, сколько раз встретился каждый символ, и возвращает словарь «символ → сколько раз».\n\nПробелы не считаются. Большие и маленькие буквы считаются одинаково, в ответе — маленькие.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> CountLetters(string text)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "CountLetters",
+      "signature": {
+        "args": [
+          "string"
+        ],
+        "ret": "dict"
+      },
+      "tests": [
+        {
+          "args": [
+            "мама"
+          ],
+          "expect": {
+            "м": 2,
+            "а": 2
+          }
+        },
+        {
+          "args": [
+            "Ok ok"
+          ],
+          "expect": {
+            "o": 2,
+            "k": 2
+          }
+        },
+        {
+          "args": [
+            "аб аб"
+          ],
+          "expect": {
+            "а": 2,
+            "б": 2
+          }
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": {},
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Ключ — строка, поэтому символ надо превратить: `letter.ToString()`.",
+        "Пробел пропускается проверкой `if (letter != ' ')`.",
+        "Считай через `if (count.ContainsKey(key))` — прибавить единицу или положить единицу."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> CountLetters(string text)\n    {\n        Dictionary<string, int> count = new Dictionary<string, int>();\n        foreach (char letter in text.ToLower())\n        {\n            if (letter != ' ')\n            {\n                string key = letter.ToString();\n                if (count.ContainsKey(key))\n                {\n                    count[key] = count[key] + 1;\n                }\n                else\n                {\n                    count[key] = 1;\n                }\n            }\n        }\n        return count;\n    }\n}\n"
+    },
+    {
+      "id": "dicts-2",
+      "topic": "dicts",
+      "title": "Лучший игрок",
+      "statement": "На вход приходит словарь «имя → счёт». Напиши функцию, которая возвращает имя игрока с наибольшим счётом.\n\nСловарь всегда непустой, и лучший всегда один.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string BestPlayer(Dictionary<string, int> scores)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "BestPlayer",
+      "signature": {
+        "args": [
+          "dict"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            {
+              "Аня": 5,
+              "Боря": 8
+            }
+          ],
+          "expect": "Боря"
+        },
+        {
+          "args": [
+            {
+              "Аня": 12,
+              "Боря": 8,
+              "Вика": 3
+            }
+          ],
+          "expect": "Аня"
+        },
+        {
+          "args": [
+            {
+              "Ян": 1
+            }
+          ],
+          "expect": "Ян"
+        },
+        {
+          "args": [
+            {
+              "Аня": -2,
+              "Боря": -5
+            }
+          ],
+          "expect": "Аня",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи `string bestName = null;` и флаг «первый ли это».",
+        "Перебирай `foreach (var pair in scores)` и смотри `pair.Key` и `pair.Value`.",
+        "С нуля начинать нельзя: счёт бывает отрицательным."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string BestPlayer(Dictionary<string, int> scores)\n    {\n        string bestName = null;\n        int bestScore = 0;\n        bool first = true;\n        foreach (var pair in scores)\n        {\n            if (first || pair.Value > bestScore)\n            {\n                bestName = pair.Key;\n                bestScore = pair.Value;\n                first = false;\n            }\n        }\n        return bestName;\n    }\n}\n"
+    },
+    {
+      "id": "dicts-3",
+      "topic": "dicts",
+      "title": "Сложить два счёта",
+      "statement": "Напиши функцию, которая объединяет два словаря «имя → счёт» в один.\n\nЕсли имя встречается в обоих, счета складываются. Исходные словари менять нельзя.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> MergeScores(Dictionary<string, int> a, Dictionary<string, int> b)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "MergeScores",
+      "signature": {
+        "args": [
+          "dict",
+          "dict"
+        ],
+        "ret": "dict"
+      },
+      "tests": [
+        {
+          "args": [
+            {
+              "Аня": 1
+            },
+            {
+              "Боря": 2
+            }
+          ],
+          "expect": {
+            "Аня": 1,
+            "Боря": 2
+          }
+        },
+        {
+          "args": [
+            {
+              "Аня": 1
+            },
+            {
+              "Аня": 2
+            }
+          ],
+          "expect": {
+            "Аня": 3
+          }
+        },
+        {
+          "args": [
+            {
+              "Аня": 3,
+              "Боря": 1
+            },
+            {
+              "Боря": 4
+            }
+          ],
+          "expect": {
+            "Аня": 3,
+            "Боря": 5
+          }
+        },
+        {
+          "args": [
+            {},
+            {
+              "Ян": 9
+            }
+          ],
+          "expect": {
+            "Ян": 9
+          },
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи новый словарь и переложи в него всё из `a`.",
+        "Потом пройди `b` и прибавляй, проверяя `ContainsKey`.",
+        "Исходные словари менять нельзя — поэтому и нужен новый."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static Dictionary<string, int> MergeScores(Dictionary<string, int> a, Dictionary<string, int> b)\n    {\n        Dictionary<string, int> result = new Dictionary<string, int>();\n        foreach (var pair in a)\n        {\n            result[pair.Key] = pair.Value;\n        }\n        foreach (var pair in b)\n        {\n            if (result.ContainsKey(pair.Key))\n            {\n                result[pair.Key] = result[pair.Key] + pair.Value;\n            }\n            else\n            {\n                result[pair.Key] = pair.Value;\n            }\n        }\n        return result;\n    }\n}\n"
+    }
+  ]
+}

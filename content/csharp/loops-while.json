@@ -1,0 +1,180 @@
+{
+  "topic": "loops-while",
+  "lang": "csharp",
+  "order": 4,
+  "title": "Цикл while",
+  "subtitle": "то же самое, только со скобками",
+  "theory": [
+    {
+      "id": "cs-loops-while-t1",
+      "title": "while почти не изменился",
+      "text": "Из отличий только круглые скобки вокруг условия и фигурные вокруг тела. Смысл тот же: крутимся, пока условие верно.",
+      "code": "int count = 3;\nwhile (count > 0)\n{\n    Console.WriteLine(count);\n    count = count - 1;\n}\n\nConsole.WriteLine(\"поехали\");",
+      "code_python": "count = 3\nwhile count > 0:\n    print(count)\n    count = count - 1\n\nprint(\"поехали\")"
+    },
+    {
+      "id": "cs-loops-while-t2",
+      "title": "Бесконечный цикл здесь опаснее",
+      "text": "В браузере Python сайт прерывает зависшую программу сам. C# запускается на компьютере тьютора: программа получает десять секунд, потом её снимают, и ты видишь сообщение про слишком долгую работу.\n\nВывод тот же: спрашивай себя, что именно в теле цикла приближает конец.",
+      "code": "int n = 10;\nint steps = 0;\n\nwhile (n > 1)\n{\n    n = n / 2;\n    steps = steps + 1;\n}\n\nConsole.WriteLine(\"шагов: \" + steps);",
+      "code_python": "n = 10\nsteps = 0\n\nwhile n > 1:\n    n = n // 2\n    steps = steps + 1\n\nprint(\"шагов:\", steps)"
+    },
+    {
+      "id": "cs-loops-while-t3",
+      "title": "Разбираем число на цифры",
+      "text": "Приём тот же: `% 10` даёт последнюю цифру, деление на 10 её отрезает.\n\nЗдесь целочисленное деление получается само собой: `n / 10` для двух целых уже целое. Это тот случай, когда строгость типов C# работает на нас.",
+      "code": "int n = 4071;\n\nwhile (n > 0)\n{\n    Console.WriteLine(n % 10);\n    n = n / 10;\n}",
+      "code_python": "n = 4071\n\nwhile n > 0:\n    print(n % 10)\n    n = n // 10"
+    },
+    {
+      "id": "cs-loops-while-t4",
+      "title": "Делим диапазон пополам",
+      "text": "Тот же алгоритм, который вы разбирали, и та же запись — с поправкой на скобки.\n\n`break` и `return` работают как в Python.",
+      "code": "int lo = 1;\nint hi = 100;\nint secret = 73;\nint tries = 0;\n\nwhile (true)\n{\n    int mid = (lo + hi) / 2;\n    tries = tries + 1;\n    if (mid == secret)\n    {\n        break;\n    }\n    if (mid < secret)\n    {\n        lo = mid + 1;\n    }\n    else\n    {\n        hi = mid - 1;\n    }\n}\n\nConsole.WriteLine(\"попыток: \" + tries);",
+      "code_python": "lo = 1\nhi = 100\nsecret = 73\ntries = 0\n\nwhile True:\n    mid = (lo + hi) // 2\n    tries = tries + 1\n    if mid == secret:\n        break\n    if mid < secret:\n        lo = mid + 1\n    else:\n        hi = mid - 1\n\nprint(\"попыток:\", tries)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "loops-while-1",
+      "topic": "loops-while",
+      "title": "Сколько цифр в числе",
+      "statement": "Напиши функцию, которая считает, сколько цифр в числе n.\n\nПревращать число в строку нельзя — вся задача в том, чтобы отрезать цифры делением.\n\nУ нуля одна цифра.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int DigitsCount(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "DigitsCount",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            12345
+          ],
+          "expect": 5
+        },
+        {
+          "args": [
+            7
+          ],
+          "expect": 1
+        },
+        {
+          "args": [
+            1000
+          ],
+          "expect": 4
+        },
+        {
+          "args": [
+            0
+          ],
+          "expect": 1,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Превращать в строку нельзя: отрезай цифры делением на 10.",
+        "`n / 10` для двух целых само даёт целое — отдельного `//` в C# нет.",
+        "Ноль обработай отдельно: `while (n > 0)` для него не сделает ни шага."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int DigitsCount(int n)\n    {\n        if (n == 0)\n        {\n            return 1;\n        }\n        int count = 0;\n        while (n > 0)\n        {\n            n = n / 10;\n            count = count + 1;\n        }\n        return count;\n    }\n}\n"
+    },
+    {
+      "id": "loops-while-2",
+      "topic": "loops-while",
+      "title": "Шаги Коллатца",
+      "statement": "Правило: чётное число делим на 2, нечётное умножаем на 3 и прибавляем 1. Рано или поздно получится единица.\n\nНапиши функцию, которая считает, сколько шагов нужно, чтобы из n получить 1. Для единицы ответ — 0 шагов.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int CollatzSteps(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "CollatzSteps",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            6
+          ],
+          "expect": 8
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 0
+        },
+        {
+          "args": [
+            7
+          ],
+          "expect": 16
+        },
+        {
+          "args": [
+            2
+          ],
+          "expect": 1,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Крути `while (n != 1)` и считай шаги.",
+        "Чётность: `if (n % 2 == 0)`.",
+        "Внутри: `n = n / 2;` либо `n = n * 3 + 1;`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int CollatzSteps(int n)\n    {\n        int steps = 0;\n        while (n != 1)\n        {\n            if (n % 2 == 0)\n            {\n                n = n / 2;\n            }\n            else\n            {\n                n = n * 3 + 1;\n            }\n            steps = steps + 1;\n        }\n        return steps;\n    }\n}\n"
+    },
+    {
+      "id": "loops-while-3",
+      "topic": "loops-while",
+      "title": "Угадать за семь попыток",
+      "statement": "Компьютер угадывает число от 1 до 100 делением диапазона пополам — тот самый алгоритм, который вы уже разбирали.\n\nНапиши функцию, которая возвращает, сколько попыток на это уйдёт.\n\nПравило строгое, иначе ответы разойдутся: каждая попытка — это `mid = (lo + hi) // 2`. Если не угадали, отбрасываем ненужную половину.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int BinaryGuess(int secret)\n    {\n        int lo = 1;\n        int hi = 100;\n        // твой код\n    }\n}\n",
+      "entry": "BinaryGuess",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            50
+          ],
+          "expect": 1
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": 6
+        },
+        {
+          "args": [
+            100
+          ],
+          "expect": 7
+        },
+        {
+          "args": [
+            75
+          ],
+          "expect": 2,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Крути `while (true)` и выходи через `return`, когда `mid == secret`.",
+        "Середина: `int mid = (lo + hi) / 2;` — деление целых как раз и даёт нужное округление вниз.",
+        "Если `mid < secret`, то `lo = mid + 1;`, иначе `hi = mid - 1;`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int BinaryGuess(int secret)\n    {\n        int lo = 1;\n        int hi = 100;\n        int tries = 0;\n        while (true)\n        {\n            int mid = (lo + hi) / 2;\n            tries = tries + 1;\n            if (mid == secret)\n            {\n                return tries;\n            }\n            if (mid < secret)\n            {\n                lo = mid + 1;\n            }\n            else\n            {\n                hi = mid - 1;\n            }\n        }\n    }\n}\n"
+    }
+  ]
+}

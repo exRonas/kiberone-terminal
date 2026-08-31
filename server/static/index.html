@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Терминал — KIBERone</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="gate-body">
+
+<main class="gate">
+  <div class="gate-mark">
+    <span class="mark-glyph">&gt;_</span>
+    <span class="gate-word">Терминал</span>
+  </div>
+  <p class="gate-sub">Повторяем язык: теория, задачи, проверка тестами.</p>
+
+  <form class="gate-form" id="gate-form" autocomplete="off">
+    <label class="gate-label" for="name">Как тебя зовут</label>
+    <div class="gate-input">
+      <span class="gate-prompt">&gt;</span>
+      <input id="name" name="name" type="text" maxlength="32" required
+             placeholder="имя" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="gate-hint" id="gate-hint">Имя нужно, чтобы твой прогресс попал в общую таблицу.</div>
+
+    <div class="gate-label gate-label-2">Язык занятия</div>
+    <div class="gate-langs" id="gate-langs">
+      <button class="lang" type="submit" value="python" data-lang="python">
+        <span class="lang-name">Python</span>
+        <span class="lang-note">первое занятие</span>
+      </button>
+      <button class="lang" type="submit" value="csharp" data-lang="csharp">
+        <span class="lang-name">C#</span>
+        <span class="lang-note">второе занятие</span>
+      </button>
+    </div>
+  </form>
+
+  <div class="gate-foot">
+    <a class="gate-link" href="/board">Таблица группы</a>
+    <span class="gate-dot">·</span>
+    <a class="gate-link" href="/tutor">Тьютору</a>
+  </div>
+  <div id="gate-status"></div>
+</main>
+
+<script src="/net.js"></script>
+<script src="/index.js"></script>
+</body>
+</html>

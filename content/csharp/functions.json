@@ -1,0 +1,210 @@
+{
+  "topic": "functions",
+  "lang": "csharp",
+  "order": 7,
+  "title": "Функции",
+  "subtitle": "тип ответа обещают заранее",
+  "theory": [
+    {
+      "id": "cs-functions-t1",
+      "title": "Тип каждого параметра и тип ответа",
+      "text": "В Python имена параметров ничего не обещают. В C# у каждого объявлен тип, и у ответа тоже.\n\n`static int Area(int width, int height)` читается справа налево: получает два целых, отдаёт целое.\n\nПередашь строку вместо числа — компилятор скажет `CS1503` и не запустит программу. Это и есть польза от типов: ошибка ловится до запуска.",
+      "code": "static int Area(int width, int height)\n{\n    int result = width * height;\n    return result;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(Area(3, 4));\n    Console.WriteLine(Area(10, 2));\n}",
+      "code_python": "def area(width, height):\n    result = width * height\n    return result\n\n\nprint(area(3, 4))\nprint(area(10, 2))"
+    },
+    {
+      "id": "cs-functions-t2",
+      "title": "return обязан быть во всех ветках",
+      "text": "В Python функция без `return` тихо вернёт `None`, и ты узнаешь об этом, только когда не сойдутся тесты.\n\nВ C# компилятор проверяет это заранее: если есть путь, на котором `return` не выполнится, будет `CS0161: not all code paths return a value`.\n\nЭто одна из самых полезных ошибок компилятора. Она ловит ровно ту оплошность, которую в Python приходится искать руками.",
+      "code": "static string Sign(int x)\n{\n    if (x > 0)\n    {\n        return \"плюс\";\n    }\n    if (x < 0)\n    {\n        return \"минус\";\n    }\n    return \"ноль\";\n}\n\nstatic void Main()\n{\n    Console.WriteLine(Sign(5));\n    Console.WriteLine(Sign(-2));\n    Console.WriteLine(Sign(0));\n}",
+      "code_python": "def sign(x):\n    if x > 0:\n        return \"плюс\"\n    if x < 0:\n        return \"минус\"\n    return \"ноль\"\n\n\nprint(sign(5))\nprint(sign(-2))\nprint(sign(0))"
+    },
+    {
+      "id": "cs-functions-t3",
+      "title": "Функция вызывает другую функцию",
+      "text": "Здесь ничего не меняется: пишем маленькую функцию, пользуемся ей как кирпичом.\n\nОбе живут внутри одной рамки `class Program`, поэтому видят друг друга и вызываются просто по имени.\n\nПорядок объявления не важен: в отличие от Python, C# сначала читает файл целиком, и метод можно вызвать выше того места, где он написан.",
+      "code": "static bool IsEven(int n)\n{\n    return n % 2 == 0;\n}\n\nstatic int CountEven(int[] numbers)\n{\n    int count = 0;\n    foreach (int x in numbers)\n    {\n        if (IsEven(x))\n        {\n            count = count + 1;\n        }\n    }\n    return count;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(CountEven(new int[] { 1, 2, 3, 4, 6 }));\n}",
+      "code_python": "def is_even(n):\n    return n % 2 == 0\n\n\ndef count_even(numbers):\n    count = 0\n    for x in numbers:\n        if is_even(x):\n            count = count + 1\n    return count\n\n\nprint(count_even([1, 2, 3, 4, 6]))"
+    },
+    {
+      "id": "cs-functions-t4",
+      "title": "Одна функция — одно дело",
+      "text": "Правило то же самое, и в C# оно даже нагляднее: по одной строке с типами видно, что функция принимает и что обещает вернуть.\n\n`static bool IsLong(string password)` не нуждается в пояснениях.",
+      "code": "static bool IsLong(string password)\n{\n    return password.Length >= 8;\n}\n\nstatic bool HasDigit(string password)\n{\n    foreach (char ch in password)\n    {\n        if (ch >= '0' && ch <= '9')\n        {\n            return true;\n        }\n    }\n    return false;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(IsLong(\"abc\"));\n    Console.WriteLine(HasDigit(\"abc1\"));\n}",
+      "code_python": "def is_long(password):\n    return len(password) >= 8\n\n\ndef has_digit(password):\n    for ch in password:\n        if ch in \"0123456789\":\n            return True\n    return False\n\n\nprint(is_long(\"abc\"))\nprint(has_digit(\"abc1\"))"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "functions-1",
+      "topic": "functions",
+      "title": "Простое ли число",
+      "statement": "Число простое, если делится только на 1 и на себя. 1 простым не считается.\n\nНапиши функцию, которая возвращает True или False.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsPrime(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "IsPrime",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "bool"
+      },
+      "tests": [
+        {
+          "args": [
+            7
+          ],
+          "expect": true
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            9
+          ],
+          "expect": false
+        },
+        {
+          "args": [
+            2
+          ],
+          "expect": true,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Числа меньше 2 сразу не простые.",
+        "`for (int d = 2; d < n; d++)` и проверка `n % d == 0`.",
+        "Нашёл делитель — `return false;`. Дошёл до конца — `return true;`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsPrime(int n)\n    {\n        if (n < 2)\n        {\n            return false;\n        }\n        for (int d = 2; d < n; d++)\n        {\n            if (n % d == 0)\n            {\n                return false;\n            }\n        }\n        return true;\n    }\n}\n"
+    },
+    {
+      "id": "functions-2",
+      "topic": "functions",
+      "title": "Все простые до n",
+      "statement": "Напиши функцию, которая возвращает массив простых чисел от 2 до n включительно.\n\nОна обязана вызывать твою `IsPrime` из прошлой задачи, а не проверять делимость заново. В этом весь смысл задачи.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsPrime(int n)\n    {\n        // решение из прошлой задачи\n    }\n\n    static int[] PrimesUpTo(int n)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "PrimesUpTo",
+      "signature": {
+        "args": [
+          "int"
+        ],
+        "ret": "int[]"
+      },
+      "tests": [
+        {
+          "args": [
+            10
+          ],
+          "expect": [
+            2,
+            3,
+            5,
+            7
+          ]
+        },
+        {
+          "args": [
+            2
+          ],
+          "expect": [
+            2
+          ]
+        },
+        {
+          "args": [
+            20
+          ],
+          "expect": [
+            2,
+            3,
+            5,
+            7,
+            11,
+            13,
+            17,
+            19
+          ]
+        },
+        {
+          "args": [
+            1
+          ],
+          "expect": [],
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Сначала перенеси сюда `IsPrime` из прошлой задачи целиком.",
+        "Дальше обычный `for (int i = 2; i <= n; i++)` и `List<int>`.",
+        "Внутри: `if (IsPrime(i)) { result.Add(i); }`, в конце `return result.ToArray();`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsPrime(int n)\n    {\n        if (n < 2)\n        {\n            return false;\n        }\n        for (int d = 2; d < n; d++)\n        {\n            if (n % d == 0)\n            {\n                return false;\n            }\n        }\n        return true;\n    }\n\n    static int[] PrimesUpTo(int n)\n    {\n        List<int> result = new List<int>();\n        for (int i = 2; i <= n; i++)\n        {\n            if (IsPrime(i))\n            {\n                result.Add(i);\n            }\n        }\n        return result.ToArray();\n    }\n}\n",
+      "must_call": [
+        "IsPrime"
+      ]
+    },
+    {
+      "id": "functions-3",
+      "topic": "functions",
+      "title": "Надёжность пароля",
+      "statement": "Пароль проверяется по трём признакам, и каждый вынесен в свою функцию:\n\n`IsLong` — длина не меньше 8\n`HasDigit` — есть хотя бы одна цифра\n`HasUpper` — есть хотя бы одна большая английская буква\n\n`PasswordStrength` считает, сколько признаков выполнено: три — «сильный», два — «средний», меньше двух — «слабый». Она обязана вызывать все три функции.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsLong(string password)\n    {\n        // твой код\n    }\n\n    static bool HasDigit(string password)\n    {\n        // твой код\n    }\n\n    static bool HasUpper(string password)\n    {\n        // твой код\n    }\n\n    static string PasswordStrength(string password)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "PasswordStrength",
+      "signature": {
+        "args": [
+          "string"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            "abc"
+          ],
+          "expect": "слабый"
+        },
+        {
+          "args": [
+            "abcdefgh"
+          ],
+          "expect": "слабый"
+        },
+        {
+          "args": [
+            "abcdefg1"
+          ],
+          "expect": "средний"
+        },
+        {
+          "args": [
+            "Abcdefg1"
+          ],
+          "expect": "сильный"
+        },
+        {
+          "args": [
+            "ABC1"
+          ],
+          "expect": "средний",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Каждая из трёх маленьких функций возвращает `bool`.",
+        "Цифра: `ch >= '0' && ch <= '9'`. Большая буква: `ch >= 'A' && ch <= 'Z'`.",
+        "В `PasswordStrength` заведи счётчик и прибавляй по единице за каждую сработавшую проверку."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static bool IsLong(string password)\n    {\n        return password.Length >= 8;\n    }\n\n    static bool HasDigit(string password)\n    {\n        foreach (char ch in password)\n        {\n            if (ch >= '0' && ch <= '9')\n            {\n                return true;\n            }\n        }\n        return false;\n    }\n\n    static bool HasUpper(string password)\n    {\n        foreach (char ch in password)\n        {\n            if (ch >= 'A' && ch <= 'Z')\n            {\n                return true;\n            }\n        }\n        return false;\n    }\n\n    static string PasswordStrength(string password)\n    {\n        int score = 0;\n        if (IsLong(password))\n        {\n            score = score + 1;\n        }\n        if (HasDigit(password))\n        {\n            score = score + 1;\n        }\n        if (HasUpper(password))\n        {\n            score = score + 1;\n        }\n        if (score == 3)\n        {\n            return \"сильный\";\n        }\n        if (score == 2)\n        {\n            return \"средний\";\n        }\n        return \"слабый\";\n    }\n}\n",
+      "must_call": [
+        "IsLong",
+        "HasDigit",
+        "HasUpper"
+      ]
+    }
+  ]
+}

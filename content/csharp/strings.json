@@ -1,0 +1,185 @@
+{
+  "topic": "strings",
+  "lang": "csharp",
+  "order": 6,
+  "title": "Строки",
+  "subtitle": "char, ToLower и StringBuilder",
+  "theory": [
+    {
+      "id": "cs-strings-t1",
+      "title": "Символ — это не строка",
+      "text": "В Python `text[0]` даёт строку длиной один. В C# это `char` — отдельный тип.\n\nОтсюда разные кавычки: строка в двойных `\"кот\"`, символ в одинарных `'к'`. Перепутаешь — получишь `CS0029: cannot convert`.\n\nДлина строки — `Length`, как у массива.",
+      "code": "string text = \"привет\";\n\nConsole.WriteLine(text.Length);\nConsole.WriteLine(text[0]);\nConsole.WriteLine(text.Contains(\"ив\"));\n\nforeach (char letter in text)\n{\n    Console.WriteLine(letter);\n}",
+      "code_python": "text = \"привет\"\n\nprint(len(text))\nprint(text[0])\nprint(\"ив\" in text)\n\nfor letter in text:\n    print(letter)"
+    },
+    {
+      "id": "cs-strings-t2",
+      "title": "Регистр и поиск",
+      "text": "`lower()` становится `ToLower()`, `upper()` — `ToUpper()`. Скобки обязательны: это методы.\n\nПроверка вхождения — `Contains`, как у списка. Питоновского `in` для строк в C# нет.",
+      "code": "string text = \"Привет, Мир\";\n\nConsole.WriteLine(text.ToLower());\nConsole.WriteLine(text.ToUpper());\nConsole.WriteLine(text);\n\nConsole.WriteLine(text.Contains(\"мир\"));\nConsole.WriteLine(text.ToLower().Contains(\"мир\"));",
+      "code_python": "text = \"Привет, Мир\"\n\nprint(text.lower())\nprint(text.upper())\nprint(text)\n\nprint(\"мир\" in text)\nprint(\"мир\" in text.lower())"
+    },
+    {
+      "id": "cs-strings-t3",
+      "title": "Строку нельзя менять — её собирают заново",
+      "text": "Это верно и в Python, но в C# заметнее. Каждое `result = result + letter` создаёт новую строку целиком. В коротком цикле это неважно, в длинном — заметно тормозит.\n\nПоэтому для сборки строки в цикле берут `StringBuilder`: он копит символы и отдаёт готовую строку по `ToString()`.\n\nВ наших задачах хватит и обычного `+`, но знать про StringBuilder полезно.",
+      "code": "string text = \"кот\";\n\nstring back = \"\";\nforeach (char letter in text)\n{\n    back = letter + back;\n}\nConsole.WriteLine(back);\n\nSystem.Text.StringBuilder b = new System.Text.StringBuilder();\nforeach (char letter in text)\n{\n    b.Append(letter);\n    b.Append('-');\n}\nConsole.WriteLine(b.ToString());",
+      "code_python": "text = \"кот\"\n\nback = \"\"\nfor letter in text:\n    back = letter + back\nprint(back)\n\nresult = \"\"\nfor letter in text:\n    result = result + letter + \"-\"\nprint(result)"
+    },
+    {
+      "id": "cs-strings-t4",
+      "title": "Буква и её номер",
+      "text": "В Python номер символа берут через `ord`, обратно — через `chr`. В C# `char` и так число: его достаточно привести к `int` и обратно.\n\n`(int)'a'` даёт 97, `(char)(97 + 3)` даёт `'d'`. Скобки с типом называются приведением — это и есть замена ord и chr.\n\nШифр Цезаря отсюда собирается один в один так же, как в Python.",
+      "code": "Console.WriteLine((int)'a');\nConsole.WriteLine((int)'b');\nConsole.WriteLine((char)97);\n\nchar letter = 'a';\nchar shifted = (char)((int)letter + 3);\nConsole.WriteLine(shifted);",
+      "code_python": "print(ord(\"a\"))\nprint(ord(\"b\"))\nprint(chr(97))\n\nletter = \"a\"\nshifted = chr(ord(letter) + 3)\nprint(shifted)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "strings-1",
+      "topic": "strings",
+      "title": "Задом наперёд",
+      "statement": "Напиши функцию, которая возвращает строку, записанную задом наперёд.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Reverse(string text)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Reverse",
+      "signature": {
+        "args": [
+          "string"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            "привет"
+          ],
+          "expect": "тевирп"
+        },
+        {
+          "args": [
+            "кот"
+          ],
+          "expect": "ток"
+        },
+        {
+          "args": [
+            "a"
+          ],
+          "expect": "a"
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": "",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Заведи `string result = \"\";` до цикла.",
+        "Перебирай `foreach (char letter in text)` и приписывай слева: `result = letter + result;`.",
+        "Тогда последний символ окажется первым."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Reverse(string text)\n    {\n        string result = \"\";\n        foreach (char letter in text)\n        {\n            result = letter + result;\n        }\n        return result;\n    }\n}\n"
+    },
+    {
+      "id": "strings-2",
+      "topic": "strings",
+      "title": "Сколько гласных",
+      "statement": "Напиши функцию, которая считает гласные в тексте — русские и английские.\n\nРусские гласные: а е ё и о у ы э ю я. Английские: a e i o u.\n\nБольшие и маленькие буквы считаются одинаково.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int CountVowels(string text)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "CountVowels",
+      "signature": {
+        "args": [
+          "string"
+        ],
+        "ret": "int"
+      },
+      "tests": [
+        {
+          "args": [
+            "Привет"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            "Hello"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            "Ёжик"
+          ],
+          "expect": 2
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expect": 0,
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Сложи гласные в строку: `string vowels = \"аеёиоуыэюяaeiou\";`.",
+        "Проверка вхождения символа — `vowels.Contains(letter)`.",
+        "Не забудь `text.ToLower()`, иначе большие буквы не найдутся."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static int CountVowels(string text)\n    {\n        string vowels = \"аеёиоуыэюяaeiou\";\n        int count = 0;\n        foreach (char letter in text.ToLower())\n        {\n            if (vowels.Contains(letter))\n            {\n                count = count + 1;\n            }\n        }\n        return count;\n    }\n}\n"
+    },
+    {
+      "id": "strings-3",
+      "topic": "strings",
+      "title": "Шифр Цезаря",
+      "statement": "Продолжение вашего модуля «Этичный хакинг».\n\nНапиши функцию, которая сдвигает каждую английскую букву на shift позиций по алфавиту. После «z» счёт идёт снова с «a».\n\nРегистр сохраняется. Всё, что не английская буква — пробелы, запятые, цифры — остаётся как было.",
+      "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Caesar(string text, int shift)\n    {\n        // твой код\n    }\n}\n",
+      "entry": "Caesar",
+      "signature": {
+        "args": [
+          "string",
+          "int"
+        ],
+        "ret": "string"
+      },
+      "tests": [
+        {
+          "args": [
+            "abc",
+            1
+          ],
+          "expect": "bcd"
+        },
+        {
+          "args": [
+            "XYZ",
+            3
+          ],
+          "expect": "ABC"
+        },
+        {
+          "args": [
+            "Hello, World!",
+            5
+          ],
+          "expect": "Mjqqt, Btwqi!"
+        },
+        {
+          "args": [
+            "abc",
+            0
+          ],
+          "expect": "abc",
+          "hidden": true
+        }
+      ],
+      "hints": [
+        "Символы сравниваются как числа: `letter >= 'a' && letter <= 'z'`.",
+        "Сдвиг с переходом через конец: `(letter - 'a' + shift) % 26`.",
+        "Прибавь `'a'` и приведи обратно: `(char)(... + 'a')`. Для больших букв то же самое с `'A'`."
+      ],
+      "solution": "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static string Caesar(string text, int shift)\n    {\n        string result = \"\";\n        foreach (char letter in text)\n        {\n            if (letter >= 'a' && letter <= 'z')\n            {\n                result = result + (char)((letter - 'a' + shift) % 26 + 'a');\n            }\n            else if (letter >= 'A' && letter <= 'Z')\n            {\n                result = result + (char)((letter - 'A' + shift) % 26 + 'A');\n            }\n            else\n            {\n                result = result + letter;\n            }\n        }\n        return result;\n    }\n}\n"
+    }
+  ]
+}
