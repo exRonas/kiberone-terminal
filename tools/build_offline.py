@@ -188,6 +188,9 @@ def build_app_js():
 
 def build_topic_html():
     html = read(os.path.join(STATIC, "topic.html"))
+    html = swap(html, '<script src="/theme.js"></script>',
+                '<script src="theme.js"></script>',
+                "подключение theme.js")
     html = swap(html, '<script src="/net.js"></script>',
                 '<script src="content.js"></script>\n<script src="net.js"></script>',
                 "подключение net.js")
@@ -212,6 +215,7 @@ def build_index(order):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Терминал — Python</title>
+<script src="theme.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="gate-body">
@@ -221,6 +225,7 @@ def build_index(order):
     <span class="mark-glyph">&gt;_</span>
     <span class="gate-word">Терминал</span>
     <span class="mark-lang">python</span>
+    <span class="gate-theme" data-theme-slot></span>
   </div>
   <p class="gate-sub">Повторяем язык: теория, задачи, проверка тестами.
     Эта версия работает без интернета — прямо на твоём ноутбуке.</p>
@@ -370,6 +375,7 @@ def main():
     write(os.path.join(OUT, "index.js"), INDEX_JS)
     write(os.path.join(OUT, "style.css"), read(os.path.join(STATIC, "style.css")) + EXTRA_CSS)
     shutil.copy2(os.path.join(STATIC, "runner.js"), os.path.join(OUT, "runner.js"))
+    shutil.copy2(os.path.join(STATIC, "theme.js"), os.path.join(OUT, "theme.js"))
 
     # Вендор нужен целиком: без интернета взять его будет неоткуда.
     vendor_src = os.path.join(STATIC, "vendor")
