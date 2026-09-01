@@ -136,6 +136,7 @@ Blazor и Roslyn в браузере — по той же причине.
 | Палитра, типографика, вся вёрстка | `server/static/style.css` |
 | Снимок экрана и проба на живой странице через CDP | `tools/shot.js`, `tools/probe.js` |
 | Шпаргалка с решениями для тьютора | `tools/make_solutions.py` |
+| Сборщик офлайн-версии для флешки (только Python, без сервера) | `tools/build_offline.py`, описание в `docs/ОФЛАЙН.md` |
 
 ### API
 
