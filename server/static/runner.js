@@ -5,6 +5,7 @@
   'use strict';
 
   var EXEC_LIMIT_MS = 2500; // защита от бесконечного цикла
+  var MAX_STEPS = 600;      // столько шагов хватает любому примеру теории
 
   function builtinRead(path) {
     if (!global.Sk.builtinFiles || !global.Sk.builtinFiles.files[path]) {
@@ -15,13 +16,17 @@
 
   // Skulpt настраивается заново перед каждым запуском: это заодно
   // сбрасывает отсчёт лимита времени.
-  function configure(onOutput) {
+  // debugging включает остановку перед каждой строкой — на нём держится
+  // пошаговый режим. Компилятор смотрит на этот флаг в момент разбора кода,
+  // поэтому configure обязан отработать до importMainWithBody.
+  function configure(onOutput, debugging) {
     global.Sk.configure({
       output: onOutput,
       read: builtinRead,
       execLimit: EXEC_LIMIT_MS,
       killableWhile: true,
       killableFor: true,
+      debugging: !!debugging,
       __future__: global.Sk.python3,
       inputfun: function () {
         throw new global.Sk.builtin.Exception('input() здесь не работает — данные приходят в аргументах функции');
@@ -255,8 +260,105 @@
     });
   }
 
+  // ---------- пошаговое выполнение ----------
+
+  // Служебные имена, которые Python заводит сам. Ребёнку в «коробках»
+  // им не место.
+  var HOUSEKEEPING = { __name__: 1, __doc__: 1, __package__: 1, __file__: 1, __builtins__: 1 };
+
+  // Skulpt переименовывает переменные, чьи имена заняты в JavaScript:
+  // `name` внутри становится `name_$rw$`. Ребёнку показываем исходное имя.
+  function unmangle(key) { return key.replace(/_\$rw\$$/, ''); }
+
+  // Снимок «коробок» на текущем шаге. Функции пропускаем: коробкой
+  // со значением их называть рано, про def теория говорит отдельно.
+  function readVars(loc) {
+    var vars = [];
+    if (!loc) return vars;
+    Object.keys(loc).forEach(function (key) {
+      if (key.charAt(0) === '$') return;
+      if (HOUSEKEEPING[key]) return;
+      var value = loc[key];
+      try {
+        if (global.Sk.builtin.checkCallable(value)) return;
+        vars.push({ name: unmangle(key), value: pyRepr(global.Sk.ffi.remapToJs(value)) });
+      } catch (ignored) {
+        /* значение не переводится в JS — показывать нечего */
+      }
+    });
+    return vars;
+  }
+
+  var CANCELLED = { cancelled: true };
+  var TOO_LONG = { tooLong: true };
+
+  // Выполняет код, останавливаясь перед каждой строкой.
+  //
+  // onStep(info, resume) зовётся перед выполнением строки: info.line —
+  // номер этой строки, info.vars — что уже лежит в коробках, info.output —
+  // что уже напечатано. Пока не вызовут resume, программа стоит.
+  //
+  // Возвращает пульт: finished — промис с итогом, fast() — досчитать
+  // без остановок, cancel() — прекратить. И то и другое срабатывает
+  // на следующем resume.
+  function stepSnippet(code, onStep) {
+    var out = [];
+    var steps = 0;
+    var control = { fast: false, cancelled: false };
+
+    configure(function (t) { out.push(t); }, true);
+
+    var finished = global.Sk.misceval.asyncToPromise(function () {
+      return global.Sk.importMainWithBody('<stdin>', false, code, true);
+    }, {
+      'Sk.debug': function (susp) {
+        return new Promise(function (resolve, reject) {
+          function resume() {
+            // Лимит времени считается от старта программы, а между шагами
+            // ребёнок думает сколько хочет. Без сброса защита от вечного
+            // цикла срабатывала бы на ровном месте.
+            global.Sk.execStart = new Date();
+            resolve(susp.resume());
+          }
+
+          if (control.cancelled) return reject(CANCELLED);
+          if (++steps > MAX_STEPS) return reject(TOO_LONG);
+          if (control.fast) return resume();
+
+          // Номер строки и значения лежат на вложенном кадре, а не на самой
+          // приостановке: у неё только data и ссылка на ребёнка.
+          var frame = susp.child || susp;
+          onStep({
+            line: typeof frame.$lineno === 'number' ? frame.$lineno : null,
+            vars: readVars(frame.$loc),
+            output: out.join(''),
+            step: steps
+          }, resume);
+        });
+      }
+    }).then(function () {
+      return { ok: true, done: true, output: out.join('') };
+    }, function (e) {
+      if (e === CANCELLED) return { cancelled: true, output: out.join('') };
+      if (e === TOO_LONG) {
+        return {
+          tooLong: true, output: out.join(''),
+          error: { line: null, text: 'в этом примере слишком много шагов, чтобы пройти его по одному. Запусти его целиком.' }
+        };
+      }
+      return { ok: false, output: out.join(''), error: humanize(e) };
+    });
+
+    return {
+      finished: finished,
+      fast: function () { control.fast = true; },
+      cancel: function () { control.cancelled = true; }
+    };
+  }
+
   global.Runner = {
     runSnippet: runSnippet,
+    stepSnippet: stepSnippet,
     callEntry: callEntry,
     pyRepr: pyRepr,
     deepEqual: deepEqual,

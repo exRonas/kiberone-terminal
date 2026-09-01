@@ -56,6 +56,18 @@
     var s = readStore('solved');
     s[id] = true;
     writeStore('solved', s);
+    setPostponed(id, false);   // решена — значит, откладывать больше нечего
+  }
+
+  // Отложенная задача. Хранится рядом с решёнными, но это разные вещи:
+  // отложенная не засчитывается и никуда не пропадает.
+  function isPostponed(id) { return readStore('postponed')[id] === true; }
+
+  function setPostponed(id, on) {
+    var p = readStore('postponed');
+    if (on) p[id] = true;
+    else delete p[id];
+    writeStore('postponed', p);
   }
 
   function savedCode(id) { return readStore('code')[id]; }
@@ -79,6 +91,21 @@
     return Object.keys(s).filter(function (id) {
       return s[id] === true && id.indexOf(topic + '-') === 0;
     }).length;
+  }
+
+  function postponedInTopic(topic) {
+    var p = readStore('postponed');
+    var s = readStore('solved');
+    return Object.keys(p).filter(function (id) {
+      return p[id] === true && s[id] !== true && id.indexOf(topic + '-') === 0;
+    }).length;
+  }
+
+  // Тема разобрана, когда с каждой задачей что-то сделали: решили или
+  // сознательно отложили. Отложенные не идут в прогресс, но и не держат
+  // ребёнка в теме — трудная задача не должна останавливать занятие.
+  function handledInTopic(topic) {
+    return Math.min(solvedInTopic(topic) + postponedInTopic(topic), TASKS_PER_TOPIC);
   }
 
   // ---------- мелочи ----------
@@ -136,6 +163,205 @@
     return opts;
   }
 
+  // ---------- пошаговое выполнение примера ----------
+
+  // Панель шагов: пульт, строка состояния и «коробки» с переменными.
+  // Собирается сразу, но живёт скрытой, пока не нажали «По шагам».
+  function makeStepperDom() {
+    var node = document.createElement('div');
+    node.className = 'stepper';
+    node.hidden = true;
+
+    var bar = document.createElement('div');
+    bar.className = 'stepper-bar';
+
+    function button(text, cls) {
+      var b = document.createElement('button');
+      b.className = 'btn btn-sm' + (cls ? ' ' + cls : '');
+      b.type = 'button';
+      b.textContent = text;
+      bar.appendChild(b);
+      return b;
+    }
+
+    var refs = {
+      node: node,
+      // Жёлтой на этой панели остаётся только строка кода: она показывает,
+      // где программа стоит. Вторая жёлтая кнопка спорила бы с «Проверить».
+      next: button('Шаг', 'btn-step'),
+      all: button('До конца'),
+      again: button('Сначала'),
+      leave: button('Выйти')
+    };
+
+    var where = document.createElement('span');
+    where.className = 'stepper-where';
+    bar.appendChild(where);
+    refs.where = where;
+
+    var vars = document.createElement('div');
+    vars.className = 'stepper-vars';
+    refs.vars = vars;
+
+    node.appendChild(bar);
+    node.appendChild(vars);
+    return refs;
+  }
+
+  // Одна пометка на строке кода: где программа стоит прямо сейчас.
+  function markLine(cm, line) {
+    if (cm.$stepLine !== undefined && cm.$stepLine !== null) {
+      cm.removeLineClass(cm.$stepLine, 'background', 'cm-step');
+      cm.removeLineClass(cm.$stepLine, 'gutter', 'cm-step-gutter');
+    }
+    cm.$stepLine = null;
+    if (typeof line !== 'number' || line < 1 || line > cm.lineCount()) return;
+    cm.$stepLine = line - 1;
+    cm.addLineClass(cm.$stepLine, 'background', 'cm-step');
+    cm.addLineClass(cm.$stepLine, 'gutter', 'cm-step-gutter');
+    cm.scrollIntoView({ line: cm.$stepLine, ch: 0 }, 40);
+  }
+
+  // before — что лежало в коробках на прошлом шаге. Изменившаяся коробка
+  // подсвечивается: это и есть ответ на вопрос «что сделала эта строка».
+  // На первом шаге сравнивать не с чем, и не подсвечивается ничего.
+  function renderVars(host, vars, before) {
+    if (!vars.length) {
+      host.innerHTML = '<span class="stepper-empty">Коробок пока нет — ни одной переменной не создано.</span>';
+      return;
+    }
+    host.innerHTML = vars.map(function (v) {
+      var fresh = before && before[v.name] !== v.value;
+      return '<span class="box' + (fresh ? ' is-fresh' : '') + '">' +
+        '<span class="box-name">' + esc(v.name) + '</span>' +
+        '<span class="box-value">' + esc(v.value) + '</span>' +
+        '</span>';
+    }).join('');
+  }
+
+  function varsMap(vars) {
+    var map = {};
+    vars.forEach(function (v) { map[v.name] = v.value; });
+    return map;
+  }
+
+  function wireStepper(refs, stepBtn, runBtn, cm, out) {
+    var session = null;   // {ctl, resume} — пока не null, программа стоит на строке
+    var before = null;    // значения коробок на прошлом шаге
+
+    function setOut(text, bad) {
+      out.className = 'example-out' + (bad ? ' is-error' : '');
+      out.textContent = text;
+    }
+
+    function enter() {
+      refs.node.hidden = false;
+      stepBtn.disabled = true;
+      runBtn.disabled = true;
+      // Правка кода посреди трассы рассинхронизировала бы подсветку строк.
+      cm.setOption('readOnly', 'nocursor');
+      cm.getWrapperElement().classList.add('is-stepping');
+    }
+
+    function leave() {
+      if (session && session.ctl) {
+        session.ctl.cancel();
+        if (session.resume) session.resume();
+      }
+      session = null;
+      refs.node.hidden = true;
+      stepBtn.disabled = false;
+      runBtn.disabled = false;
+      cm.setOption('readOnly', false);
+      cm.getWrapperElement().classList.remove('is-stepping');
+      markLine(cm, null);
+    }
+
+    function waiting(on) {
+      refs.next.disabled = !on;
+      refs.all.disabled = !on;
+    }
+
+    function start() {
+      enter();
+      setOut('');
+      before = null;
+      refs.where.textContent = 'программа запускается';
+      renderVars(refs.vars, [], null);
+      waiting(false);
+
+      // Первая остановка приходит синхронно, ещё до возврата из stepSnippet,
+      // поэтому запись о трассе заводим заранее. Сравнение с mine отсекает
+      // хвост прошлой трассы, если нажали «Сначала».
+      var mine = { ctl: null, resume: null };
+      session = mine;
+
+      mine.ctl = Runner.stepSnippet(cm.getValue(), function (info, resume) {
+        if (session !== mine) return resume();
+        mine.resume = resume;
+        markLine(cm, info.line);
+        refs.where.textContent = info.line
+          ? 'сейчас выполнится строка ' + info.line
+          : 'шаг ' + info.step;
+        renderVars(refs.vars, info.vars, before);
+        before = varsMap(info.vars);
+        setOut(info.output, false);
+        waiting(true);
+        // Фокус остаётся на «Шаге»: дальше можно идти с клавиатуры,
+        // не целясь мышью в маленькую кнопку двадцать раз подряд.
+        refs.next.focus({ preventScroll: true });
+      });
+
+      mine.ctl.finished.then(function (res) {
+        if (session !== mine || res.cancelled) return;   // вышли сами или начали заново
+        mine.resume = null;
+        waiting(false);
+        markLine(cm, null);
+        // Шагать больше некуда — уводим фокус на «Сначала», чтобы тот,
+        // кто идёт с клавиатуры, не остался ни на чём.
+        if (refs.node.contains(document.activeElement)) {
+          refs.again.focus({ preventScroll: true });
+        }
+        if (res.ok) {
+          refs.where.textContent = 'программа закончилась';
+          setOut(res.output || 'Программа ничего не напечатала.', false);
+        } else {
+          refs.where.textContent = res.tooLong ? 'слишком много шагов' : 'программа остановилась на ошибке';
+          setOut((res.output ? res.output + '\n' : '') + errorPlain(res.error), true);
+        }
+      });
+    }
+
+    stepBtn.addEventListener('click', start);
+
+    refs.next.addEventListener('click', function () {
+      if (!session || !session.resume) return;
+      var resume = session.resume;
+      // Кнопку не гасим: она снова понадобится через миг, а гашение
+      // срывает с неё фокус, и шагать с клавиатуры становится нельзя.
+      // От повторного нажатия защищает обнулённый resume.
+      session.resume = null;
+      resume();
+    });
+
+    refs.all.addEventListener('click', function () {
+      if (!session || !session.resume) return;
+      var resume = session.resume;
+      session.resume = null;
+      waiting(false);
+      refs.where.textContent = 'досчитываю…';
+      session.ctl.fast();
+      resume();
+    });
+
+    refs.again.addEventListener('click', function () {
+      leave();
+      start();
+    });
+
+    refs.leave.addEventListener('click', leave);
+  }
+
   // Один запускаемый пример. lang задаёт и подсветку, и способ запуска.
   function makeExample(host, code, lang) {
     var example = document.createElement('div');
@@ -155,25 +381,47 @@
     runBtn.className = 'btn btn-sm';
     runBtn.type = 'button';
     runBtn.textContent = 'Запустить';
+    bar.appendChild(runBtn);
+
+    // По шагам умеет только Python: он выполняется здесь же, в браузере.
+    // C# компилируется на сервере и приходит уже посчитанным целиком.
+    // В теме C# рядом всегда стоит тот же пример на Python — шаги живут там.
+    var stepBtn = null;
+    if (lang !== 'csharp') {
+      stepBtn = document.createElement('button');
+      stepBtn.className = 'btn btn-sm';
+      stepBtn.type = 'button';
+      stepBtn.textContent = 'По шагам';
+      stepBtn.title = 'Выполнить по одной строке и смотреть, что меняется';
+      bar.appendChild(stepBtn);
+    }
+
     var note = document.createElement('span');
     note.className = 'bar-note';
     note.textContent = lang === 'csharp' ? 'считает сервер' : 'код можно менять';
-    bar.appendChild(runBtn);
     bar.appendChild(note);
 
     var out = document.createElement('pre');
     out.className = 'example-out';
 
+    var stepper = stepBtn ? makeStepperDom() : null;
+
     example.appendChild(bar);
+    if (stepper) example.appendChild(stepper.node);
     example.appendChild(out);
     host.appendChild(example);
 
     var cm = CodeMirror.fromTextArea(ta, cmBase({
-      lineNumbers: false,
+      // В пошаговом режиме номера строк — единственный способ сказать
+      // «сейчас выполняется вот эта». В примере C# они нужны не меньше:
+      // ошибка компилятора приходит с номером строки.
+      lineNumbers: true,
       viewportMargin: Infinity,
       mode: lang === 'csharp' ? 'text/x-csharp' : 'python'
     }));
     cm.setValue(code);
+
+    if (stepper) wireStepper(stepper, stepBtn, runBtn, cm, out);
 
     runBtn.addEventListener('click', function () {
       runBtn.disabled = true;
@@ -274,7 +522,39 @@
       });
     });
 
-    return chain.then(function () { return { results: results, printed: printed }; });
+    return chain.then(function () {
+      results.printHint = printInsteadOfReturn(task, results, printed);
+      return { results: results, printed: printed };
+    });
+  }
+
+  // Самая частая путаница первого занятия: ребёнок печатает ответ вместо
+  // того, чтобы его вернуть. Внизу при этом стоит правильный текст, а все
+  // тесты красные с «получилось None» — без объяснения это выглядит
+  // издевательством. Ловим случай, когда все упавшие тесты вернули None,
+  // а на экран при этом что-то напечатано.
+  //
+  // В C# такой ловушки нет: там компилятор сам скажет, что функция обязана
+  // вернуть значение.
+  function printInsteadOfReturn(task, results, printed) {
+    if (!printed) return null;
+
+    var failed = 0;
+    for (var i = 0; i < task.tests.length; i++) {
+      var r = results[i];
+      if (!r || r.pass) continue;
+      if (r.error) return null;                                  // упало по другой причине
+      if (r.got !== null && r.got !== undefined) return null;    // вернуло что-то, просто не то
+      failed++;
+    }
+    if (!failed) return null;
+
+    return {
+      line: null,
+      text: 'функция напечатала правильный текст, но не вернула его. ' +
+            'Проверка смотрит, что функция отдала в ответ через `return`, а `print` только показывает текст на экране ' +
+            'и наружу не отдаёт ничего. Замени `print(...)` на `return ...`.'
+    };
   }
 
   function runCsharp(code, task) {
@@ -342,16 +622,22 @@
     meter.innerHTML = '';
     var total = 0;
 
-    // Темы идут по порядку: открыта каждая до первой недорешённой
+    // Темы идут по порядку: открыта каждая до первой неразобранной
     // включительно. Вернуться к пройденной можно всегда.
+    //
+    // Граница считается по разобранным, а не по решённым: три отложенные
+    // задачи открывают следующую тему так же, как три решённые. Насечки
+    // при этом честные — они показывают только решённое.
     var counts = TOPIC_ORDER.map(function (t) { return Math.min(solvedInTopic(t), TASKS_PER_TOPIC); });
+    var handled = TOPIC_ORDER.map(handledInTopic);
     var frontier = counts.length - 1;
-    for (var k = 0; k < counts.length; k++) {
-      if (counts[k] < TASKS_PER_TOPIC) { frontier = k; break; }
+    for (var k = 0; k < handled.length; k++) {
+      if (handled[k] < TASKS_PER_TOPIC) { frontier = k; break; }
     }
 
     TOPIC_ORDER.forEach(function (t, idx) {
       var done = counts[idx];
+      var later = postponedInTopic(t);
       total += done;
 
       var info = topicInfo(t);
@@ -369,14 +655,17 @@
       seg.dataset.topic = t;
 
       var title = (info && info.title) || TOPIC_NAMES[t];
+      var count = done + ' из ' + TASKS_PER_TOPIC + (later ? ', отложено ' + later : '');
       seg.title = !ready
         ? title + ' — тема ещё не готова'
-        : (open ? title + ' — ' + done + ' из ' + TASKS_PER_TOPIC
-                : title + ' — откроется, когда закончишь предыдущую');
+        : (open ? title + ' — ' + count
+                : title + ' — откроется, когда разберёшься с предыдущей');
 
+      // Насечки идут тремя состояниями: решено, отложено, ещё не тронуто.
+      // Отложенное видно по всему курсу — ребёнок знает, куда вернуться.
       for (var i = 0; i < TASKS_PER_TOPIC; i++) {
         var n = document.createElement('div');
-        n.className = 'notch' + (i < done ? ' is-done' : '');
+        n.className = 'notch' + (i < done ? ' is-done' : (i < done + later ? ' is-later' : ''));
         n.dataset.index = String(i);
         seg.appendChild(n);
       }
@@ -397,6 +686,21 @@
       if (state.topics[i].topic === topic) return state.topics[i];
     }
     return null;
+  }
+
+  // Следующая готовая тема курса. Без списка тем (сервер молчит) не зовём
+  // никуда: перейти всё равно не выйдет, содержимое темы берётся с сервера.
+  function nextTopicAfter(topic) {
+    if (!state.topics) return null;
+    for (var i = TOPIC_ORDER.indexOf(topic) + 1; i < TOPIC_ORDER.length; i++) {
+      var info = topicInfo(TOPIC_ORDER[i]);
+      if (info && info.ready) return TOPIC_ORDER[i];
+    }
+    return null;
+  }
+
+  function goToTopic(topic) {
+    location.href = '/topic?lang=' + state.lang + '&topic=' + topic;
   }
 
   // Вспышка новой насечки: жёлтая — «сейчас», потом оседает в бирюзу.
@@ -474,11 +778,21 @@
 
   function currentTask() { return state.data.tasks[state.taskIndex]; }
 
+  // Следующая задача, за которую стоит взяться. Отложенные уходят в конец
+  // очереди, но не теряются: когда свободных больше нет, сюда возвращается
+  // именно отложенная — на неё и укажет кнопка после сдачи.
   function nextUnsolvedIndex() {
+    var later = -1;
     for (var i = 0; i < state.data.tasks.length; i++) {
-      if (!isSolved(state.data.tasks[i].id)) return i;
+      var id = state.data.tasks[i].id;
+      if (isSolved(id)) continue;
+      if (isPostponed(id)) {
+        if (later < 0) later = i;
+        continue;
+      }
+      return i;
     }
-    return -1;
+    return later;
   }
 
   function renderTaskNav(callIndex) {
@@ -490,8 +804,9 @@
       b.type = 'button';
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(i === state.taskIndex));
-      b.innerHTML = '<span class="pip' + (isSolved(task.id) ? ' is-done' : '') + '"></span>' + (i + 1);
-      b.title = task.title;
+      var mark = isSolved(task.id) ? ' is-done' : (isPostponed(task.id) ? ' is-later' : '');
+      b.innerHTML = '<span class="pip' + mark + '"></span>' + (i + 1);
+      b.title = task.title + (mark === ' is-later' ? ' — отложена' : '');
       b.addEventListener('click', function () { goToTask(i); });
       nav.appendChild(b);
     });
@@ -510,6 +825,15 @@
 
     el('task-title').textContent = task.title;
     el('task-statement').innerHTML = inlineCode(task.statement);
+
+    // Правило проверки стоит у каждой задачи постоянно, а не всплывает
+    // после ошибки: «напечатал вместо вернул» — самая частая путаница,
+    // и узнавать о ней из четырёх красных тестов незачем.
+    el('task-rule').innerHTML = inlineCode(
+      state.lang === 'csharp'
+        ? 'Как засчитывается: проверка вызывает функцию и смотрит, что она вернула через `return`. Напечатанное через `Console.WriteLine` в ответ не идёт.'
+        : 'Как засчитывается: проверка вызывает функцию и смотрит, что она вернула через `return`. Напечатанное через `print` в ответ не идёт.'
+    );
 
     if (state.editor) {
       state.editor.toTextArea();
@@ -532,11 +856,75 @@
 
     renderHints();
     renderTests(null);
+    renderLater();
     reportActivity();
     renderCompare(task);
 
     // Уже решённую задачу открываем со штампом — прогресс никуда не делся.
     if (isSolved(task.id)) showLatch(task, true);
+  }
+
+  // Задачу можно отложить и вернуться к ней позже: слишком трудная задача
+  // не должна останавливать всё занятие.
+  function renderLater() {
+    var task = currentTask();
+    var btn = el('later-btn');
+    var note = el('later-note');
+
+    if (isSolved(task.id)) {
+      btn.hidden = true;
+      note.hidden = true;
+      return;
+    }
+
+    var on = isPostponed(task.id);
+    btn.hidden = false;
+    btn.textContent = on ? 'Вернуть в работу' : 'Отложить';
+    note.hidden = !on;
+    if (!on) return;
+
+    // Отложив последнюю задачу темы, ребёнок иначе остался бы на экране
+    // без единого выхода: сдавать нечего, штампа нет, а следующая тема
+    // прячется в мелких сегментах шапки. Говорим прямо.
+    var whole = handledInTopic(state.topic) >= TASKS_PER_TOPIC;
+    var onward = whole ? nextTopicAfter(state.topic) : null;
+
+    el('later-sub').textContent = whole
+      ? 'Со всеми задачами темы ты разобрался. Отложенные ждут здесь — вернёшься, когда захочешь.'
+      : 'Она осталась в списке сверху и ждёт. Возьмись за неё, когда будешь готов.';
+
+    var onwardBtn = el('later-next');
+    onwardBtn.hidden = !onward;
+    onwardBtn.onclick = onward ? function () { goToTopic(onward); } : null;
+  }
+
+  function toggleLater() {
+    var task = currentTask();
+
+    // Решённую задачу откладывать нечего. Кнопка на ней спрятана, но
+    // скрытая кнопка всё равно отвечает на click — проверяем по состоянию.
+    if (isSolved(task.id)) return;
+
+    if (isPostponed(task.id)) {
+      setPostponed(task.id, false);
+      renderLater();
+      renderTaskNav();
+      renderRail();
+      return;
+    }
+
+    setPostponed(task.id, true);
+    renderTaskNav();
+    renderRail();   // насечка становится контурной, следующая тема может открыться
+
+    // Пока в теме осталась неразобранная задача — уводим на неё. Когда
+    // разобраны все, остаёмся здесь: отбрасывать ребёнка обратно к первой
+    // отложенной незачем, ему уже открыта следующая тема.
+    if (handledInTopic(state.topic) < TASKS_PER_TOPIC) {
+      var next = nextUnsolvedIndex();
+      if (next >= 0 && next !== state.taskIndex) return goToTask(next);
+    }
+    renderLater();
   }
 
   function clearVerdict() {
@@ -744,6 +1132,7 @@
   // повторять её в каждой красной строке — шум.
   function headlineError(task, results) {
     if (results.fatal) return results.fatal;
+    if (results.printHint) return results.printHint;
     for (var i = 0; i < task.tests.length; i++) {
       if (results[i] && !results[i].pass) return results[i].error || null;
     }
@@ -892,15 +1281,24 @@
     el('latch-sub').textContent = parts.join(' · ');
 
     var btn = el('latch-next');
+    btn.hidden = false;
+    btn.disabled = false;
+
     if (next >= 0) {
-      btn.hidden = false;
       btn.textContent = 'Задача ' + (next + 1);
       btn.onclick = function () { goToTask(next); };
     } else {
-      btn.hidden = false;
-      btn.textContent = 'Тема закрыта';
-      btn.disabled = true;
-      btn.onclick = null;
+      // Раньше здесь стояла погасшая кнопка «Тема закрыта» — ребёнок
+      // упирался в тупик и искал следующую тему в мелких сегментах шапки.
+      var onward = nextTopicAfter(state.topic);
+      if (onward) {
+        btn.textContent = 'Следующая тема';
+        btn.onclick = function () { goToTopic(onward); };
+      } else {
+        btn.textContent = 'Курс пройден';
+        btn.disabled = true;
+        btn.onclick = null;
+      }
     }
 
     if (quiet) {
@@ -944,6 +1342,8 @@
       takeHint(task.id, taken + 1);
       renderHints();
     });
+
+    el('later-btn').addEventListener('click', toggleLater);
   }
 
   function boot() {

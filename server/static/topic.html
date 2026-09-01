@@ -6,6 +6,7 @@
 <title>Терминал — KIBERone</title>
 <link rel="stylesheet" href="vendor/codemirror/codemirror.css">
 <link rel="stylesheet" href="style.css">
+<script src="/theme.js"></script>
 </head>
 <body>
 
@@ -34,6 +35,7 @@
     </div>
 
     <div class="who" id="who" hidden></div>
+    <span data-theme-slot></span>
     <div id="rail-status"></div>
   </header>
 
@@ -64,6 +66,7 @@
       <div class="brief">
         <h1 class="brief-title" id="task-title"></h1>
         <div class="brief-text" id="task-statement"></div>
+        <div class="brief-rule" id="task-rule"></div>
       </div>
 
       <div class="panel panel-editor">
@@ -74,10 +77,20 @@
         <textarea id="editor"></textarea>
       </div>
 
+      <div class="later" id="later-note" hidden>
+        <span class="later-mark">||</span>
+        <div>
+          <div class="later-title">Задача отложена</div>
+          <div class="later-sub" id="later-sub"></div>
+        </div>
+        <button class="btn btn-sm later-next" id="later-next" type="button" hidden>Следующая тема</button>
+      </div>
+
       <div class="actions">
         <button class="btn btn-go" id="check-btn" type="button">Проверить</button>
         <button class="btn" id="reset-btn" type="button">Сбросить</button>
         <button class="btn btn-sm" id="hint-btn" type="button">Подсказка</button>
+        <button class="btn btn-sm" id="later-btn" type="button">Отложить</button>
         <span class="bar-note" id="hint-cost"></span>
       </div>
 

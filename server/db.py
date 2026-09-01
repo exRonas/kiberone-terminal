@@ -88,6 +88,25 @@ def upsert_student(conn, name):
     return row
 
 
+def delete_student(conn, name):
+    """Убирает ребёнка целиком: строку, прогресс и решения на обоих языках.
+
+    Каскад по внешним ключам делает это сам — `PRAGMA foreign_keys = ON`
+    стоит в connect(). Возвращает имя, как оно было записано, или None,
+    если такого ребёнка нет.
+
+    Языки не разделяются намеренно: решения на Python — это то, что
+    ребёнок увидит рядом с задачей на занятии по C#. Удалить половину
+    ребёнка значит тихо сломать вторую половину курса.
+    """
+    key = name_key(name)
+    row = conn.execute("SELECT name FROM students WHERE name_key = ?", (key,)).fetchone()
+    if row is None:
+        return None
+    conn.execute("DELETE FROM students WHERE name_key = ?", (key,))
+    return row["name"]
+
+
 def touch_activity(conn, student_id, lang, task_id):
     """Запоминает, на какой задаче ребёнок сидит сейчас и с какого момента.
 

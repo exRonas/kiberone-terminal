@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Терминал — вход</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/theme.js"></script>
+</head>
+<body class="gate-body">
+
+<main class="gate">
+  <div class="gate-mark">
+    <span class="mark-glyph">&gt;_</span>
+    <span class="gate-word">Терминал</span>
+  </div>
+  <p class="gate-sub">Эта страница для тьютора. Введи пароль.</p>
+
+  <form class="gate-form" id="login-form" autocomplete="off">
+    <label class="gate-label" for="password">Пароль</label>
+    <div class="gate-input">
+      <span class="gate-prompt">&gt;</span>
+      <input id="password" name="password" type="password" maxlength="200" required
+             placeholder="пароль" spellcheck="false" autocomplete="current-password">
+    </div>
+    <div class="gate-hint" id="login-hint">Таблица группы и страница тьютора закрыты: на странице тьютора видно время решения.</div>
+
+    <div class="login-go">
+      <button class="btn btn-go" type="submit" id="login-btn">Войти</button>
+    </div>
+  </form>
+
+  <span class="gate-theme" data-theme-slot></span>
+
+  <div class="gate-foot">
+    <a class="gate-link" href="/">К странице для детей</a>
+  </div>
+</main>
+
+<script src="/net.js"></script>
+<script src="/login.js"></script>
+</body>
+</html>

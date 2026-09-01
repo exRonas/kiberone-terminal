@@ -13,6 +13,12 @@
 
   document.getElementById('tutor-lang').textContent = lang === 'csharp' ? 'c#' : 'python';
 
+  // Ноутбук тьютора нередко общий: выход нужен, чтобы кука не жила там сутки.
+  document.getElementById('tutor-logout').addEventListener('click', function () {
+    Net.send('/api/logout', {}).then(function () { location.href = '/'; },
+                                     function () { location.href = '/'; });
+  });
+
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -64,11 +70,16 @@
 
     host.innerHTML = data.students.map(function (s) {
       var away = s.idle_sec !== null && s.idle_sec >= IDLE_SEC;
-      return '<div class="trow' + (away ? ' is-away' : '') + '">' +
+      var asking = s.name === pendingDelete;
+      return '<div class="trow' + (away ? ' is-away' : '') + (asking ? ' is-asking' : '') + '">' +
         '<span class="tname">' + esc(s.name) + '</span>' +
         '<span class="tmeter">' + meterHTML(s.topics, data.tasks_per_topic) + '</span>' +
         '<span class="thints">' + (s.hints ? s.hints + ' подск.' : '') + '</span>' +
         '<span class="tcount">' + s.solved + '<span class="tcount-of">/' + capacity + '</span></span>' +
+        '<span class="tdel">' + (asking
+          ? '<button class="btn btn-sm tdel-yes" type="button" data-del="' + esc(s.name) + '">Удалить насовсем</button>'
+          : '<button class="btn btn-sm tdel-ask" type="button" data-ask="' + esc(s.name) + '">Удалить</button>') +
+        '</span>' +
         '</div>';
     }).join('');
 
@@ -76,6 +87,61 @@
     document.getElementById('tutor-total').textContent =
       data.students.length + ' в группе · решено ' + total;
   }
+
+  // ---------- удаление ребёнка ----------
+
+  // Удаление необратимо, поэтому в два нажатия. Имя, по которому ждём
+  // подтверждения, живёт вне разметки: строки перерисовываются каждые
+  // три секунды опросом, и вопрос иначе стирало бы на полуслове.
+  var pendingDelete = null;
+  var pendingTimer = null;
+  var lastData = null;    // последний ответ сервера, чтобы перерисовать без запроса
+  var noteUntil = 0;      // до какого момента сообщение не затирается опросом
+
+  function repaint() {
+    if (lastData) renderRows(lastData);
+  }
+
+  function ask(name) {
+    pendingDelete = name;
+    clearTimeout(pendingTimer);
+    // Вопрос не висит вечно: не ответили — кнопка возвращается сама.
+    pendingTimer = setTimeout(function () {
+      pendingDelete = null;
+      repaint();
+    }, 6000);
+    repaint();
+  }
+
+  function remove(name) {
+    pendingDelete = null;
+    clearTimeout(pendingTimer);
+    repaint();
+
+    Net.send('/api/student/delete', { name: name }).then(function () {
+      // Сначала обновляем таблицу, потом пишем итог: tick чистит строку
+      // состояния сам, и сообщение иначе стёрлось бы в тот же миг.
+      tick().then(function () { note(name + ' — удалён из таблицы.', false); });
+    }, function (e) {
+      if (e.unauthorized) return location.reload();
+      note('Не удалось удалить: ' + (e.rejected ? e.message : 'сервер не отвечает.'), true);
+    });
+  }
+
+  function note(text, bad) {
+    var box = document.getElementById('tutor-status');
+    box.textContent = text;
+    box.className = 'board-link' + (bad ? ' is-bad' : '');
+    noteUntil = Date.now() + (bad ? 10000 : 5000);
+  }
+
+  document.getElementById('tutor-rows').addEventListener('click', function (ev) {
+    var asking = ev.target.closest('[data-ask]');
+    if (asking) return ask(asking.getAttribute('data-ask'));
+
+    var doomed = ev.target.closest('[data-del]');
+    if (doomed) return remove(doomed.getAttribute('data-del'));
+  });
 
   function renderKeys(data) {
     var host = document.getElementById('tutor-keys');
@@ -87,14 +153,21 @@
   }
 
   function tick() {
-    Net.get('/api/tutor?lang=' + lang).then(function (data) {
-      document.getElementById('tutor-status').textContent = '';
-      document.getElementById('tutor-status').className = 'board-link';
+    return Net.get('/api/tutor?lang=' + lang).then(function (data) {
+      lastData = data;
+      // Опрос идёт раз в три секунды и затирает строку состояния. Свежее
+      // сообщение он не трогает — иначе итог удаления гаснет, не успев
+      // прочитаться.
+      if (Date.now() > noteUntil) {
+        document.getElementById('tutor-status').textContent = '';
+        document.getElementById('tutor-status').className = 'board-link';
+      }
       document.getElementById('tutor-where').textContent = data.url || location.origin;
       renderKeys(data);
       renderStuck(data);
       renderRows(data);
-    }, function () {
+    }, function (e) {
+      if (e.unauthorized) return location.reload();   // вход протух — форма пароля
       var s = document.getElementById('tutor-status');
       s.textContent = 'Связь с сервером потеряна.';
       s.className = 'board-link is-bad';

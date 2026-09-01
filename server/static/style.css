@@ -31,12 +31,134 @@
   --bad:     #e8563c;
   --bad-d:   #5a2118;
 
+  /* Жёлтый как ЗАЛИВКА (кнопка, штамп, насечка) остаётся фирменным в обеих
+     темах. Жёлтый как ТЕКСТ на светлом фоне нечитаем, поэтому у него свой
+     токен — он и темнеет. */
+  --signal-ink: #f9ca00;
+  --ink:      #06090c;   /* текст поверх жёлтой заливки */
+  --signal-hi:#ffd626;
+  --signal-lo:#e0b500;
+  --signal-ink-dim: #1a1400;
+
+  /* поверхности и грани, вынесенные из разметки ради второй темы */
+  --sunken:   #05080b;
+  --well:     #070b0f;
+  --notch:    #26323f;
+  --notch-soon: #1b242e;
+  --edge:     #2a3846;
+  --edge-2:   #24303c;
+  --row-alt:  #0a0f14;
+  --hairline: #263341;
+  --placeholder: #3f4d5c;
+  --seg-cur:  #0d1219;
+  --seg-hover:#131c26;
+  --seg-hover-edge: #33455c;
+  --btn-hover-bg: #1e2b37;
+  --btn-hover-fg: #fff;
+  --sel-fg:   #fff;
+  --wire-hover: #0a6669;
+  --box-name-fg: #d6f3f4;
+  --box-fg:   #eafeff;
+  --pass-bg:  #071a1b;
+  --fail-bg:  #1a0d0a;
+  --verdict-bg: #180c09;
+  --verdict-fg: #f6c2b8;
+  --compare-head: #101a12;
+  --compare-edge: #1c2b20;
+  --compare-bg:   #080e0c;
+
+  /* редактор */
+  --cm-num:    #3d4b58;
+  --cm-sel:    #123243;
+  --cm-sel-hi: #16455c;
+  --cm-active: #0e1620;
+  --cm-cool:   #8fb8cc;
+  --cm-lit:    #7fc8d8;
+  --cm-comment:#55677a;
+  --cm-key:    #f9ca00;
+  --cm-cursor: #f9ca00;
+
   /* типографика: машина говорит моноширинным, человек — гротеском */
   --mono: "Cascadia Mono", Consolas, "JetBrains Mono", "DejaVu Sans Mono", monospace;
   --ui: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
 
   --r: 4px;
   --dur: 0.16s;
+}
+
+/* ============ СВЕТЛАЯ ТЕМА ============
+
+   Переключается кнопкой в шапке, выбор помнится. Меняются только токены —
+   ни одного правила вёрстки дублировать не нужно.
+
+   Что осталось прежним: жёлтый и бирюза бренда как заливка, роли цветов
+   (жёлтый — состояние, бирюза — провод) и форма значков. Что изменилось:
+   всё, что было жёлтым ТЕКСТОМ, потемнело до янтарного — на белом фоне
+   #f9ca00 не читается. По той же причине потемнели ключевые слова
+   в редакторе и курсор. */
+
+:root[data-theme="light"] {
+  --void:    #eef2f6;
+  --panel:   #ffffff;
+  --panel-2: #e9eff4;
+  --code:    #f7fafc;
+  --rail:    #e3eaf0;
+  --line:    #ccd8e2;
+  --trace:   #7fb2c8;
+
+  --text:    #0e1a23;
+  --dim:     #435666;
+  --faint:   #64788a;
+
+  --signal:  #f9ca00;
+  --signal-d:#e8ce6a;
+  --wire:    #0a8b90;
+  --wire-d:  #0d9a9e;
+  --deep:    #004f6a;
+  --bad:     #c0331d;
+  --bad-d:   #e0a99e;
+
+  --signal-ink: #8a6a00;
+  --ink:      #06090c;
+  --signal-hi:#ffd626;
+  --signal-lo:#e0b500;
+  --signal-ink-dim: #4a3d00;
+
+  --sunken:   #e7edf2;
+  --well:     #e6ecf1;
+  --notch:    #c2cfda;
+  --notch-soon: #dae2e9;
+  --edge:     #aebecc;
+  --edge-2:   #b6c5d1;
+  --row-alt:  #f5f8fa;
+  --hairline: #c2cedb;
+  --placeholder: #93a4b3;
+  --seg-cur:  #ffffff;
+  --seg-hover:#dfe7ee;
+  --seg-hover-edge: #9db1c2;
+  --btn-hover-bg: #dae4ec;
+  --btn-hover-fg: #06131c;
+  --sel-fg:   #ffffff;
+  --wire-hover: #0a7176;
+  --box-name-fg: #ffffff;
+  --box-fg:   #ffffff;
+  --pass-bg:  #e2f5f5;
+  --fail-bg:  #fbe9e6;
+  --verdict-bg: #fbe9e6;
+  --verdict-fg: #8a2716;
+  --compare-head: #e6f3e9;
+  --compare-edge: #c2d9c7;
+  --compare-bg:   #f3faf4;
+
+  --cm-num:    #98a9b7;
+  --cm-sel:    #cfe3ed;
+  --cm-sel-hi: #b5daea;
+  --cm-active: #edf3f8;
+  --cm-cool:   #1a6b8d;
+  --cm-lit:    #0a7a90;
+  --cm-comment:#7b8b99;
+  --cm-key:    #8a6a00;
+  --cm-cursor: #0e1a23;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -67,7 +189,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: var(--deep); color: #fff; }
+::selection { background: var(--deep); color: var(--sel-fg); }
 
 /* Общий язык меток: всё, что говорит машина. */
 .tag {
@@ -99,7 +221,7 @@ body {
   display: grid;
   place-items: center;
   background: var(--signal);
-  color: #06090c;
+  color: var(--ink);
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 700;
@@ -151,16 +273,19 @@ body {
   border-radius: 3px;
   transition: border-color var(--dur) ease, background var(--dur) ease;
 }
-.seg[data-current="1"] { border-color: #2a3846; background: #0d1219; }
+.seg[data-current="1"] { border-color: var(--edge); background: var(--seg-cur); }
 
 .notch {
   width: 9px;
   height: 6px;
-  background: #26323f;
+  background: var(--notch);
   border-radius: 1px;
   transition: background var(--dur) ease;
 }
 .notch.is-done { background: var(--wire); }
+/* Отложенная задача видна по всему курсу: контур вместо заливки — тот же
+   язык, что у точек в списке задач. */
+.notch.is-later { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dim); }
 
 @keyframes notch-latch {
   0%   { background: var(--signal); transform: scaleY(2.2); }
@@ -201,7 +326,7 @@ body {
 }
 
 /* Колонка теории чуть холоднее — две колонки материально разные. */
-.col-theory { background: #070b0f; }
+.col-theory { background: var(--well); }
 
 .col-head {
   display: flex;
@@ -248,12 +373,12 @@ body {
   top: 15px;
   width: 8px;
   height: 8px;
-  background: #26323f;
-  outline: 3px solid #070b0f;
+  background: var(--notch);
+  outline: 3px solid var(--well);
   transition: background var(--dur) ease;
 }
 .card[data-open="1"]::before { background: var(--signal); }
-.card[data-open="1"] { border-color: #24303c; }
+.card[data-open="1"] { border-color: var(--edge-2); }
 
 .card-head {
   display: flex;
@@ -280,7 +405,7 @@ body {
   flex: 0 0 auto;
   letter-spacing: 0.08em;
 }
-.card[data-open="1"] .card-idx { color: var(--signal); }
+.card[data-open="1"] .card-idx { color: var(--signal-ink); }
 
 .card-title { font-size: 13.5px; font-weight: 600; flex: 1 1 auto; line-height: 1.35; }
 
@@ -336,13 +461,104 @@ code {
   color: var(--dim);
   padding: 8px 10px;
   border-top: 1px solid var(--line);
-  background: #05080b;
+  background: var(--sunken);
   margin: 0;
   max-height: 150px;
   overflow: auto;
 }
 .example-out:empty { display: none; }
 .example-out.is-error { color: var(--bad); }
+
+/* Пошаговое выполнение: пульт, где мы сейчас, и коробки со значениями.
+   Жёлтая строка кода — та же логика, что и везде: жёлтый показывает
+   «вот здесь мы сейчас». */
+
+.stepper {
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+/* Атрибут hidden должен быть сильнее display у .stepper. */
+.stepper[hidden] { display: none; }
+
+.stepper-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  flex-wrap: wrap;
+}
+
+/* Главное действие панели — бирюзой: жёлтый на этом экране уже занят
+   строкой, на которой стоит программа. */
+.btn-step {
+  border-color: var(--wire-d);
+  background: var(--wire-d);
+  color: var(--box-fg);
+  font-weight: 600;
+}
+.btn-step:hover { background: var(--wire-hover); border-color: var(--wire); color: var(--btn-hover-fg); }
+.btn-step[disabled]:hover { background: var(--wire-d); border-color: var(--wire-d); color: var(--box-fg); }
+
+.stepper-where {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  margin-left: auto;
+}
+
+.stepper-vars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 8px 8px;
+}
+
+.stepper-empty { font-size: 12px; color: var(--faint); }
+
+/* Коробка со значением — метафора из первой карточки теории. */
+.box {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--wire-d);
+  border-radius: var(--r);
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.box-name {
+  background: var(--wire-d);
+  color: var(--box-name-fg);
+  padding: 2px 7px;
+}
+.box-value {
+  background: var(--code);
+  color: var(--text);
+  padding: 2px 7px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Коробка, которую только что изменила выполненная строка. Бирюза здесь
+   в своей роли «провода»: показывает, куда пошло значение. */
+.box.is-fresh { border-color: var(--wire); }
+.box.is-fresh .box-name { background: var(--wire); color: var(--ink); }
+.box.is-fresh .box-value { animation: box-fresh 0.5s ease-out; }
+
+@keyframes box-fresh {
+  from { background: var(--pass-bg); }
+  to   { background: var(--code); }
+}
+
+.cm-step { background: rgba(249, 202, 0, 0.14); }
+.cm-step-gutter { background: rgba(249, 202, 0, 0.22); }
+.cm-s-kiber .cm-step-gutter .CodeMirror-linenumber { color: var(--signal-ink); }
+
+/* Пока идёт трасса, код не редактируется: иначе подсветка строк соврёт. */
+.CodeMirror.is-stepping { opacity: 0.92; }
+.CodeMirror.is-stepping .CodeMirror-cursor { display: none; }
 
 /* ============ КНОПКИ ============ */
 
@@ -358,7 +574,7 @@ code {
   cursor: pointer;
   transition: background var(--dur) ease, border-color var(--dur) ease, color var(--dur) ease;
 }
-.btn:hover { background: #1e2b37; border-color: var(--wire-d); color: #fff; }
+.btn:hover { background: var(--btn-hover-bg); border-color: var(--wire-d); color: var(--btn-hover-fg); }
 .btn:active { background: var(--code); transform: translateY(1px); }
 .btn:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; }
 .btn[disabled] { opacity: 0.4; cursor: default; transform: none; }
@@ -367,19 +583,32 @@ code {
 /* Главное действие — единственная жёлтая кнопка на странице. */
 .btn-go {
   background: var(--signal);
-  border-color: var(--signal);
-  color: #06090c;
+  border-color: var(--signal-ink);
+  color: var(--ink);
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   padding: 6px 16px;
 }
-.btn-go:hover { background: #ffd626; border-color: #ffd626; color: #06090c; }
-.btn-go:active { background: #e0b500; border-color: #e0b500; color: #06090c; }
-.btn-go[disabled] { background: var(--signal-d); border-color: var(--signal-d); color: #1a1400; opacity: 1; }
-.btn-go[disabled]:hover { background: var(--signal-d); border-color: var(--signal-d); color: #1a1400; }
+.btn-go:hover { background: var(--signal-hi); border-color: var(--signal-hi); color: var(--ink); }
+.btn-go:active { background: var(--signal-lo); border-color: var(--signal-lo); color: var(--ink); }
+.btn-go[disabled] { background: var(--signal-d); border-color: var(--signal-d); color: var(--signal-ink-dim); opacity: 1; }
+.btn-go[disabled]:hover { background: var(--signal-d); border-color: var(--signal-d); color: var(--signal-ink-dim); }
 
 .btn-sm { font-size: 11px; padding: 4px 9px; }
+
+/* Переключатель темы — значок, а не подпись: он повторяется на каждой
+   странице и не должен спорить с ней за внимание. */
+.theme-btn {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--dim);
+}
+.gate-theme { display: block; margin-top: 24px; }
 
 .bar-note { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-left: auto; }
 
@@ -404,11 +633,14 @@ code {
 }
 .tasknav-btn:hover { background: var(--panel-2); color: var(--text); }
 .tasknav-btn:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; }
-.tasknav-btn[aria-selected="true"] { background: var(--panel-2); border-color: #2a3846; color: var(--text); }
+.tasknav-btn[aria-selected="true"] { background: var(--panel-2); border-color: var(--edge); color: var(--text); }
 
 /* Тот же квадратный узел: пустой — не решено, бирюзовый — решено. */
 .pip { width: 7px; height: 7px; background: var(--rail); flex: 0 0 auto; border-radius: 1px; }
 .pip.is-done { background: var(--wire); }
+/* Отложенная — не решённая и не пустая: контур вместо заливки. Форма несёт
+   различие сама, без опоры на цвет. */
+.pip.is-later { background: transparent; box-shadow: inset 0 0 0 1.5px var(--dim); }
 .tasknav-btn[aria-selected="true"] .pip:not(.is-done) { background: var(--signal); }
 
 @keyframes pip-call {
@@ -428,6 +660,16 @@ code {
 }
 
 .brief-text { color: var(--dim); font-size: 13.5px; margin: 0; white-space: pre-wrap; }
+
+/* Правило проверки: тихая строка, которая висит всегда. Не предупреждение
+   и не ошибка — просто условие игры, одинаковое для всех задач. */
+.brief-rule {
+  margin-top: 8px;
+  padding-left: 9px;
+  border-left: 2px solid var(--line);
+  color: var(--faint);
+  font-size: 12.5px;
+}
 
 /* Панель прибора: заголовок-плашка + содержимое */
 
@@ -452,7 +694,7 @@ code {
 .panel-note { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-left: auto; }
 
 .panel-editor { background: var(--code); }
-.panel-editor:focus-within { border-color: #2a3846; }
+.panel-editor:focus-within { border-color: var(--edge); }
 .panel-editor .CodeMirror { height: 182px; font-size: 13px; line-height: 1.6; }
 
 .actions { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
@@ -474,7 +716,7 @@ code {
   padding: 8px 10px;
   margin-bottom: 5px;
 }
-.hint-num { color: var(--signal); font-family: var(--mono); font-size: 11px; flex: 0 0 auto; padding-top: 1px; }
+.hint-num { color: var(--signal-ink); font-family: var(--mono); font-size: 11px; flex: 0 0 auto; padding-top: 1px; }
 
 /* ============ ТЕСТЫ ============ */
 
@@ -509,8 +751,8 @@ code {
 }
 .test:last-child { margin-bottom: 0; }
 
-.test[data-state="pass"] { border-color: var(--wire-d); background: #071a1b; color: var(--text); }
-.test[data-state="fail"] { border-color: var(--bad-d); background: #1a0d0a; color: var(--text); }
+.test[data-state="pass"] { border-color: var(--wire-d); background: var(--pass-bg); color: var(--text); }
+.test[data-state="fail"] { border-color: var(--bad-d); background: var(--fail-bg); color: var(--text); }
 .test[data-state="skip"] { opacity: 0.4; }
 
 .test-mark { text-align: center; color: var(--faint); font-size: 12px; line-height: 1.45; }
@@ -550,7 +792,7 @@ code {
 
 @keyframes panel-latch {
   0%   { border-color: var(--line); box-shadow: 0 0 0 0 rgba(249,202,0,0); }
-  30%  { border-color: var(--signal); box-shadow: 0 0 0 3px rgba(249,202,0,0.16); }
+  30%  { border-color: var(--signal-ink); box-shadow: 0 0 0 3px rgba(249,202,0,0.16); }
   100% { border-color: var(--wire-d); box-shadow: 0 0 0 0 rgba(249,202,0,0); }
 }
 .panel-tests.is-solved { animation: panel-latch 0.9s ease-out forwards; }
@@ -581,7 +823,7 @@ code {
   display: grid;
   place-items: center;
   background: var(--signal);
-  color: #06090c;
+  color: var(--ink);
   font-size: 14px;
   font-weight: 700;
   border-radius: 3px;
@@ -593,9 +835,50 @@ code {
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 .latch-sub { font-family: var(--mono); font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+/* Отложенная задача. Намеренно спокойнее штампа сдачи: это пауза,
+   а не событие, и жёлтый — цвет события — здесь не к месту. */
+.later {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 0 0 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--dim);
+  border-radius: 0 var(--r) var(--r) 0;
+  background: var(--panel);
+}
+.later[hidden] { display: none; }
+
+.later-mark {
+  width: 26px; height: 26px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  background: var(--rail);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.1em;
+  border-radius: 3px;
+}
+
+.later-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.later-sub { font-size: 12px; color: var(--faint); margin-top: 2px; }
+.later-next { margin-left: auto; flex: 0 0 auto; }
+.later-next[hidden] { display: none; }
 .latch-next { margin-left: auto; }
 
 /* Разбор ошибки */
@@ -606,10 +889,10 @@ code {
   border-radius: 0 var(--r) var(--r) 0;
   margin-bottom: 10px;
   white-space: pre-wrap;
-  background: #180c09;
+  background: var(--verdict-bg);
   border: 1px solid var(--bad-d);
   border-left: 3px solid var(--bad);
-  color: #f6c2b8;
+  color: var(--verdict-fg);
 }
 .verdict:empty { display: none; }
 .verdict .verdict-line {
@@ -627,7 +910,7 @@ code {
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--dim);
-  background: #05080b;
+  background: var(--sunken);
   margin: 0;
   padding: 9px 11px;
   max-height: 130px;
@@ -674,29 +957,29 @@ code {
   font-family: var(--mono);
 }
 .cm-s-kiber .CodeMirror-gutters { background: var(--code); border-right: 1px solid var(--line); }
-.cm-s-kiber .CodeMirror-linenumber { color: #3d4b58; font-size: 11px; }
+.cm-s-kiber .CodeMirror-linenumber { color: var(--cm-num); font-size: 11px; }
 .cm-s-kiber .CodeMirror-cursor { border-left: 2px solid var(--signal); }
-.cm-s-kiber .CodeMirror-selected { background: #123243; }
-.cm-s-kiber.CodeMirror-focused .CodeMirror-selected { background: #16455c; }
-.cm-s-kiber .CodeMirror-activeline-background { background: #0e1620; }
-.cm-s-kiber .CodeMirror-matchingbracket { color: var(--signal) !important; border-bottom: 1px solid var(--signal); }
+.cm-s-kiber .CodeMirror-selected { background: var(--cm-sel); }
+.cm-s-kiber.CodeMirror-focused .CodeMirror-selected { background: var(--cm-sel-hi); }
+.cm-s-kiber .CodeMirror-activeline-background { background: var(--cm-active); }
+.cm-s-kiber .CodeMirror-matchingbracket { color: var(--signal-ink) !important; border-bottom: 1px solid var(--signal); }
 
-.cm-s-kiber .cm-keyword  { color: var(--signal); }
-.cm-s-kiber .cm-builtin   { color: #8fb8cc; }
+.cm-s-kiber .cm-keyword  { color: var(--cm-key); }
+.cm-s-kiber .cm-builtin   { color: var(--cm-cool); }
 .cm-s-kiber .cm-def       { color: var(--text); font-weight: 600; }
 .cm-s-kiber .cm-variable  { color: var(--text); }
 .cm-s-kiber .cm-variable-2,
 .cm-s-kiber .cm-variable-3,
-.cm-s-kiber .cm-type      { color: #8fb8cc; }
+.cm-s-kiber .cm-type      { color: var(--cm-cool); }
 .cm-s-kiber .cm-string,
 .cm-s-kiber .cm-string-2  { color: var(--wire); }
-.cm-s-kiber .cm-number    { color: #7fc8d8; }
+.cm-s-kiber .cm-number    { color: var(--cm-lit); }
 .cm-s-kiber .cm-operator  { color: var(--dim); }
 .cm-s-kiber .cm-punctuation,
 .cm-s-kiber .cm-bracket   { color: var(--dim); }
-.cm-s-kiber .cm-comment   { color: #55677a; font-style: italic; }
-.cm-s-kiber .cm-property  { color: #8fb8cc; }
-.cm-s-kiber .cm-atom      { color: #7fc8d8; }
+.cm-s-kiber .cm-comment   { color: var(--cm-comment); font-style: italic; }
+.cm-s-kiber .cm-property  { color: var(--cm-cool); }
+.cm-s-kiber .cm-atom      { color: var(--cm-lit); }
 .cm-s-kiber .cm-meta      { color: var(--faint); }
 .cm-s-kiber .cm-error     { color: var(--bad); }
 
@@ -731,7 +1014,7 @@ code {
   gap: 7px;
   white-space: nowrap;
   font-size: 12px;
-  color: var(--signal);
+  color: var(--signal-ink);
   background: rgba(249, 202, 0, 0.07);
   border: 1px solid var(--signal-d);
   border-radius: var(--r);
@@ -748,10 +1031,10 @@ code {
 /* Сегмент индикатора работает как переход по темам */
 
 button.seg { cursor: pointer; font: inherit; color: inherit; }
-button.seg:hover { background: #131c26; border-color: #33455c; }
+button.seg:hover { background: var(--seg-hover); border-color: var(--seg-hover-edge); }
 button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; }
 .seg[data-locked="1"], .seg[data-soon="1"] { opacity: 0.4; }
-.seg[data-soon="1"] .notch { background: #1b242e; }
+.seg[data-soon="1"] .notch { background: var(--notch-soon); }
 
 /* ============ ВХОД ============ */
 
@@ -795,7 +1078,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 }
 .gate-input:focus-within { border-color: var(--wire); }
 
-.gate-prompt { color: var(--signal); font-family: var(--mono); font-size: 15px; }
+.gate-prompt { color: var(--signal-ink); font-family: var(--mono); font-size: 15px; }
 
 .gate-input input {
   flex: 1 1 auto;
@@ -807,7 +1090,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
   font-size: 15px;
   padding: 11px 0;
 }
-.gate-input input::placeholder { color: #3f4d5c; }
+.gate-input input::placeholder { color: var(--placeholder); }
 
 .gate-hint { font-size: 12px; color: var(--faint); margin-top: 8px; }
 .gate-hint.is-bad { color: var(--bad); }
@@ -834,8 +1117,12 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 .lang-name { font-family: var(--mono); font-size: 15px; font-weight: 600; }
 .lang-note { font-size: 11.5px; color: var(--faint); }
 
+/* Вход тьютора: одна жёлтая кнопка на странице — единственное действие. */
+.login-go { margin-top: 24px; }
+.login-go .btn-go { width: 100%; padding: 10px 16px; font-size: 13px; }
+
 .gate-foot { margin-top: 32px; font-size: 12px; color: var(--faint); }
-.gate-link { color: var(--faint); text-decoration: none; border-bottom: 1px solid #263341; }
+.gate-link { color: var(--faint); text-decoration: none; border-bottom: 1px solid var(--hairline); }
 .gate-link:hover { color: var(--wire); border-bottom-color: var(--wire-d); }
 .gate-link:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; }
 .gate-dot { padding: 0 6px; }
@@ -868,7 +1155,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 .board-where {
   font-family: var(--mono);
   font-size: 16px;
-  color: var(--signal);
+  color: var(--signal-ink);
   border: 1px solid var(--signal-d);
   border-radius: var(--r);
   padding: 4px 12px;
@@ -915,7 +1202,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
   border: 1px solid transparent;
   transition: background 0.4s ease, border-color 0.4s ease;
 }
-.brow:nth-child(odd) { background: #0a0f14; }
+.brow:nth-child(odd) { background: var(--row-alt); }
 
 .bname {
   font-family: var(--mono);
@@ -931,7 +1218,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 .bnotch {
   flex: 1 1 0;
   height: 20px;
-  background: #26323f;
+  background: var(--notch);
   border-radius: 2px;
   transition: background 0.5s ease;
 }
@@ -947,7 +1234,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 
 /* Строка, которая только что выросла: короткая жёлтая вспышка. */
 @keyframes brow-grow {
-  0%   { background: rgba(249, 202, 0, 0.16); border-color: var(--signal); }
+  0%   { background: rgba(249, 202, 0, 0.16); border-color: var(--signal-ink); }
   100% { background: transparent; border-color: transparent; }
 }
 .brow.is-grown { animation: brow-grow 2.4s ease-out; }
@@ -958,7 +1245,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
   margin-top: 10px;
   font-family: var(--mono);
   font-size: 17px;
-  color: var(--signal);
+  color: var(--signal-ink);
 }
 
 .board-foot {
@@ -975,7 +1262,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 .key b { font-family: var(--mono); color: var(--dim); font-weight: 600; margin-right: 4px; }
 
 .board-link { font-size: 13px; color: var(--faint); }
-.board-link.is-bad { color: var(--signal); }
+.board-link.is-bad { color: var(--signal-ink); }
 
 /* ============ СТРАНИЦА ТЬЮТОРА ============ */
 
@@ -1018,7 +1305,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 
 /* Долго сидит: не ошибка, а повод подойти. */
 .stuck.is-long { border-color: var(--signal-d); background: rgba(249, 202, 0, 0.05); }
-.stuck.is-long .stuck-time { color: var(--signal); }
+.stuck.is-long .stuck-time { color: var(--signal-ink); }
 
 .tutor-quiet { padding: 14px; color: var(--faint); font-size: 13px; }
 
@@ -1026,7 +1313,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 
 .trow {
   display: grid;
-  grid-template-columns: 180px 1fr 90px 90px;
+  grid-template-columns: 180px 1fr 90px 90px 150px;
   gap: 12px;
   align-items: center;
   padding: 6px 10px;
@@ -1038,11 +1325,28 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 .tname { font-family: var(--mono); font-size: 14px; font-weight: 600; }
 .tmeter { display: flex; gap: 8px; }
 .tseg { display: flex; gap: 2px; flex: 1 1 0; }
-.tnotch { flex: 1 1 0; height: 9px; background: #26323f; border-radius: 1px; }
+.tnotch { flex: 1 1 0; height: 9px; background: var(--notch); border-radius: 1px; }
 .tnotch.is-done { background: var(--wire); }
 .thints { font-family: var(--mono); font-size: 11.5px; color: var(--faint); text-align: right; }
 .tcount { font-family: var(--mono); font-size: 16px; font-weight: 700; text-align: right; }
 .tcount-of { font-size: 11px; font-weight: 400; color: var(--faint); }
+
+/* Удаление ребёнка. Обычная кнопка держится в тени — её жмут раз в занятие,
+   а не по ходу дела. Красной она становится только в момент вопроса:
+   красный здесь значит «сейчас произойдёт необратимое». */
+.tdel { text-align: right; }
+.tdel-ask { opacity: 0.72; }
+.trow:hover .tdel-ask { opacity: 1; }
+.tdel-ask:focus-visible { opacity: 1; }
+
+.tdel-yes {
+  border-color: var(--bad);
+  color: var(--bad);
+  font-weight: 600;
+}
+.tdel-yes:hover { background: var(--fail-bg); border-color: var(--bad); color: var(--bad); }
+
+.trow.is-asking { background: var(--fail-bg); }
 
 .tutor-empty { padding: 24px; color: var(--faint); font-size: 13px; }
 
@@ -1060,7 +1364,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
 /* Панель живёт в левой колонке: тогда две колонки страницы — это буквально
    два языка, и своё решение видно рядом с пустым редактором. */
 .panel-compare { background: var(--code); min-width: 0; margin-bottom: 14px; }
-.panel-compare .panel-head { background: #101a12; border-bottom-color: #1c2b20; }
+.panel-compare .panel-head { background: var(--compare-head); border-bottom-color: var(--compare-edge); }
 .panel-compare .tag { color: var(--wire); }
 .panel-compare .CodeMirror {
   height: auto;
@@ -1068,7 +1372,7 @@ button.seg:focus-visible { outline: 2px solid var(--wire); outline-offset: 2px; 
   max-height: 230px;
   font-size: 12.5px;
   line-height: 1.6;
-  background: #080e0c;
+  background: var(--compare-bg);
 }
 .panel-compare .CodeMirror-scroll { max-height: 230px; }
 .panel-compare .CodeMirror-cursor { display: none; }

@@ -92,7 +92,8 @@
       statusBox.textContent = '';
       statusBox.className = 'board-link';
       render(data);
-    }, function () {
+    }, function (e) {
+      if (e.unauthorized) return location.reload();   // вход протух — форма пароля
       statusBox.textContent = 'Связь с сервером потеряна — таблица не обновляется. Дети продолжают решать.';
       statusBox.className = 'board-link is-bad';
     });

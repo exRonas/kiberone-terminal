@@ -130,8 +130,8 @@ def test_python_starter_does_not_solve_it():
 # ------------------------------------------------------------------ база и API
 
 @pytest.fixture()
-def api(tmp_path, monkeypatch):
-    """Сервер на отдельной базе, чтобы не трогать рабочую."""
+def guest(tmp_path, monkeypatch):
+    """Сервер на отдельной базе, чтобы не трогать рабочую. Без входа тьютора."""
     httpx = pytest.importorskip("httpx")
     from fastapi.testclient import TestClient
 
@@ -140,6 +140,16 @@ def api(tmp_path, monkeypatch):
 
     import app as app_module
     return TestClient(app_module.app)
+
+
+@pytest.fixture()
+def api(guest):
+    """То же, но уже с введённым паролем: таблица и страница тьютора закрыты,
+    а почти всё, что тут проверяется, смотрит именно на них."""
+    import app as app_module
+    r = guest.post("/api/login", json={"password": app_module.PASSWORD})
+    assert r.status_code == 200
+    return guest
 
 
 def test_progress_flow(api):
@@ -202,6 +212,90 @@ def test_board_hides_time_and_tutor_shows_it(api):
     row = [s for s in tutor["students"] if s["name"] == "Глеб"][0]
     assert row["on_task_sec"] is not None
     assert tutor["task_titles"]["basics-1"]
+
+
+def test_board_and_tutor_need_password(guest):
+    assert guest.get("/api/board?lang=python").status_code == 401
+    assert guest.get("/api/tutor?lang=python").status_code == 401
+
+
+def test_closed_pages_show_the_login_form(guest):
+    # Отдаётся форма по тому же адресу, а не редирект: после входа хватит перезагрузки.
+    for path in ("/board", "/tutor"):
+        r = guest.get(path)
+        assert r.status_code == 200
+        assert "Терминал — вход" in r.text
+        assert "Движение группы" not in r.text
+        assert "Кто где сидит" not in r.text
+
+
+def test_static_html_does_not_bypass_the_password(guest):
+    # Статика примонтирована в корень, так что board.html доступен и по имени файла.
+    for path in ("/board.html", "/tutor.html", "/BOARD.HTML"):
+        assert "Терминал — вход" in guest.get(path).text
+
+
+def test_wrong_password_rejected(guest):
+    assert guest.post("/api/login", json={"password": "admin"}).status_code == 401
+    assert guest.get("/api/tutor?lang=python").status_code == 401
+
+
+def test_logout_closes_it_again(api):
+    assert api.get("/api/tutor?lang=python").status_code == 200
+    assert api.post("/api/logout").status_code == 200
+    assert api.get("/api/tutor?lang=python").status_code == 401
+
+
+def test_children_are_not_locked_out(guest):
+    """Пароль стоит только на таблице и странице тьютора. Всё детское открыто —
+    иначе занятие остановится вместе с ним."""
+    assert guest.get("/").status_code == 200
+    assert guest.get("/topic?lang=python&topic=basics").status_code == 200
+    assert guest.get("/api/topics/python").status_code == 200
+    assert guest.get("/api/content/python/basics.json").status_code == 200
+    assert guest.post("/api/session", json={"name": "Аня"}).status_code == 200
+    assert guest.post("/api/progress", json={
+        "name": "Аня", "lang": "python", "task_id": "basics-1",
+        "solved": True, "hints": 0, "code": "x"}).status_code == 200
+
+
+def test_deleting_a_student_needs_the_password(guest):
+    """Иначе удалить кого угодно мог бы любой ребёнок с той же страницы."""
+    guest.post("/api/session", json={"name": "Аня"})
+    assert guest.post("/api/student/delete", json={"name": "Аня"}).status_code == 401
+    # и никто никуда не делся
+    assert guest.post("/api/session", json={"name": "Аня"}).status_code == 200
+
+
+def test_delete_removes_the_student_everywhere(api):
+    api.post("/api/progress", json={
+        "name": "Аня", "lang": "python", "task_id": "basics-1",
+        "solved": True, "hints": 1, "code": "def greet(name): return 1"})
+    api.post("/api/progress", json={
+        "name": "Аня", "lang": "csharp", "task_id": "basics-1",
+        "solved": True, "hints": 0, "code": "class Program {}"})
+    api.post("/api/session", json={"name": "Боря"})
+
+    assert api.post("/api/student/delete", json={"name": "Аня"}).json()["deleted"] == "Аня"
+
+    for lang in ("python", "csharp"):
+        names = [s["name"] for s in api.get("/api/board?lang=" + lang).json()["students"]]
+        assert "Аня" not in names
+        assert "Боря" in names
+
+    # Решения уходят вместе с ребёнком, иначе на занятии по C# всплыл бы
+    # чужой код под его именем.
+    assert api.get("/api/solution/python/basics-1?name=Аня").json()["code"] is None
+
+
+def test_delete_is_case_insensitive_like_everything_else(api):
+    api.post("/api/session", json={"name": "Аня"})
+    assert api.post("/api/student/delete", json={"name": "аня"}).status_code == 200
+    assert not api.get("/api/board?lang=python").json()["students"]
+
+
+def test_deleting_an_unknown_name_is_404(api):
+    assert api.post("/api/student/delete", json={"name": "Никого"}).status_code == 404
 
 
 def test_board_is_paginated(api):

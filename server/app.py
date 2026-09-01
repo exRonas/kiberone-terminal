@@ -6,14 +6,16 @@
 работать, гаснет только общая таблица.
 """
 
+import hashlib
+import hmac
 import json
 import os
 import socket
 import sys
 import time
 
-from fastapi import APIRouter, FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
@@ -50,6 +52,75 @@ TOPIC_TITLES = {
 
 app = FastAPI(title="Терминал", docs_url=None, redoc_url=None)
 api = APIRouter(prefix="/api")
+
+
+# ---------------------------------------------------------------- пароль
+
+# Таблица группы и страница тьютора закрыты паролем: на странице тьютора
+# видно время решения, а его дети видеть не должны нигде.
+#
+# Это защита от любопытного ребёнка, а не от злоумышленника: связь идёт
+# по обычному http внутри класса, пароль ходит открытым текстом.
+PASSWORD = os.environ.get("TERMINAL_PASSWORD", "admin123")
+COOKIE = "terminal_admin"
+COOKIE_MAX_AGE = 12 * 60 * 60   # учебный день; на утро следующего дня вход заново
+
+# Пути в нижнем регистре: на Windows статика отдаётся и по /Board.html.
+PROTECTED_PAGES = ("/board", "/board.html", "/tutor", "/tutor.html")
+PROTECTED_API = ("/api/board", "/api/tutor", "/api/student/delete")
+
+
+def _token():
+    """Метка входа. Считается от пароля, а не случайная: перезапуск сервера
+    посреди занятия не должен выкидывать тьютора с проектора."""
+    return hashlib.sha256(("терминал:" + PASSWORD).encode("utf-8")).hexdigest()
+
+
+def authorized(request):
+    return hmac.compare_digest(request.cookies.get(COOKIE, ""), _token())
+
+
+@app.middleware("http")
+async def guard(request, call_next):
+    """Один заслон на всё закрытое: и на страницы, и на данные под ними.
+
+    Именно middleware, а не зависимость на маршрутах: board.html и tutor.html
+    отдаёт ещё и StaticFiles, мимо маршрутов, и без общего заслона в них
+    можно было бы зайти по прямому имени файла.
+    """
+    path = request.url.path.rstrip("/").lower() or "/"
+
+    if path in PROTECTED_API and not authorized(request):
+        return JSONResponse({"detail": "Нужен пароль"}, status_code=401)
+
+    # Страница отдаётся по тому же адресу, что просили: после входа
+    # достаточно перезагрузить её, никаких возвратных параметров в ссылке.
+    if path in PROTECTED_PAGES and not authorized(request):
+        return page("login.html")
+
+    return await call_next(request)
+
+
+class Login(BaseModel):
+    password: str = Field(min_length=1, max_length=200)
+
+
+@api.post("/login")
+def api_login(body: Login):
+    # Через bytes: compare_digest на строках спотыкается о не-ASCII в пароле.
+    if not hmac.compare_digest(body.password.encode("utf-8"), PASSWORD.encode("utf-8")):
+        raise HTTPException(status_code=401, detail="Пароль не подходит")
+    res = JSONResponse({"ok": True})
+    res.set_cookie(COOKIE, _token(), max_age=COOKIE_MAX_AGE,
+                   httponly=True, samesite="lax")
+    return res
+
+
+@api.post("/logout")
+def api_logout():
+    res = JSONResponse({"ok": True})
+    res.delete_cookie(COOKIE)
+    return res
 
 
 # ---------------------------------------------------------------- контент
@@ -290,6 +361,20 @@ def api_board(lang: str = "python", limit: int = Query(default=100, ge=1, le=500
     return _board_payload(lang, limit, offset, with_time=False)
 
 
+@api.post("/student/delete")
+def api_student_delete(body: Session):
+    """Убирает ребёнка из таблицы. Только для тьютора — путь под паролем.
+
+    Нужно после занятия и после проб: лишние профили висят на проекторе
+    и мешают видеть группу.
+    """
+    with db.connect() as conn:
+        removed = db.delete_student(conn, body.name)
+    if removed is None:
+        raise HTTPException(status_code=404, detail="Такого имени в таблице нет")
+    return {"deleted": removed}
+
+
 @api.get("/tutor")
 def api_tutor(lang: str = "python", limit: int = Query(default=100, ge=1, le=500), offset: int = Query(default=0, ge=0)):
     if lang not in LANGS:
@@ -368,6 +453,14 @@ def banner(port):
     print("  Таблица на проектор: " + url + "/board")
     print("  Страница тьютора:    " + url + "/tutor")
     print("=" * width)
+    print()
+    # Пароль печатается в консоль тьютора: искать его в коде посреди занятия
+    # никто не будет.
+    if PASSWORD == "admin123":
+        print("  Таблица и страница тьютора под паролем: admin123")
+        print("  Свой пароль: TERMINAL_PASSWORD=... перед запуском.")
+    else:
+        print("  Таблица и страница тьютора под паролем из TERMINAL_PASSWORD.")
     print()
     print("  Если у детей не открывается — скорее всего, в этом Wi-Fi")
     print("  включена изоляция клиентов. Раздайте точку с телефона.")

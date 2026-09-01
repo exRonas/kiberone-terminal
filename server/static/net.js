@@ -51,6 +51,9 @@
         return r.json().catch(function () { return {}; }).then(function (data) {
           var err = new Error(data.detail || ('Сервер ответил ' + r.status));
           err.rejected = true;
+          // Вход протух — страница должна попросить пароль заново,
+          // а не висеть на проекторе с последними данными.
+          err.unauthorized = (r.status === 401);
           throw err;
         });
       }
