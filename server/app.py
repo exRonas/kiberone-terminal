@@ -12,7 +12,9 @@ import json
 import os
 import socket
 import sys
+import threading
 import time
+import webbrowser
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -470,6 +472,18 @@ def banner(port):
     sys.stdout.flush()   # адрес должен быть виден сразу, даже если вывод перенаправлен
 
 
+def open_browser_soon(url):
+    """Открывает браузер тьютора на своей же машине — самое быстрое
+    подтверждение, что сервер поднялся и всё работает."""
+    def go():
+        time.sleep(1.5)
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
+    threading.Thread(target=go, daemon=True).start()
+
+
 def main():
     import uvicorn
 
@@ -485,6 +499,8 @@ def main():
         print("  .NET SDK не найден: занятие по C# работать не будет,")
         print("  Python работает как обычно.")
         print()
+    sys.stdout.flush()   # та же причина, что у banner(): строка не должна ждать буфера
+    open_browser_soon("http://127.0.0.1:{}/".format(port))
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning")
 
 
